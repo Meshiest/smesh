@@ -34,6 +34,9 @@ class Player():
     self.lastAttack = time.time()
     self.attacking = True
 
+  def createBody(self, position):
+    pass
+
   def gameRender(self, screen):
     # for later
     print("Render game")
@@ -48,6 +51,7 @@ class LobbyPlayer():
     self.body.position = (random.random() - 0.5) * WIDTH / 4, HEIGHT/2
     self.poly = pymunk.Circle(self.body, self.radius)
     self.poly.friction = 0.2
+    self.body.damping = 0.9
     self.theta = parentPlayer.theta
     self.dist = parentPlayer.dist
     space.add(self.body, self.poly)

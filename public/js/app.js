@@ -55,6 +55,7 @@ var faces = [
   "face_snk_mikasa.png",
   "face_eva_rei.png",
   "face_eva_asuka.png",
+  "face_miko_himeko.png",
 ];
 
 var canvas, ctx;

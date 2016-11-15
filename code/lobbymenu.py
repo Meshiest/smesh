@@ -18,7 +18,7 @@ class LobbyMenu(GameMenu):
 
     self.body = pymunk.Body(body_type=pymunk.Body.STATIC)
     self.body.position = (0, 0)
-    self.nextMenu = ()
+
     minDim = min(WIDTH, HEIGHT)/2 + 5
     mapVerts = [(- minDim, HEIGHT)]
 

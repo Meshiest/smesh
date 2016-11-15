@@ -2,9 +2,16 @@ import pygame, random, os
 
 print(os.getcwd())
 
-# Load an image and add transparency
+# Load an image from provided path
 def load(path):
+  # Default image path
   path = "./public/res/img/" + path
+  
+  # Return none if the file does not exist
+  if not os.path.exists(path):
+    return None
+
+  # Return pygame loading the image with proper transparency
   return pygame.image.load(os.path.abspath(path)).convert_alpha()
 
 # Get a random element from an array
@@ -51,6 +58,7 @@ faces = [
   load("face/face_snk_mikasa.png"),
   load("face/face_eva_rei.png"),
   load("face/face_eva_asuka.png"),
+  load("face/face_miko_himeko.png"),
 ]
 
 # Torso Images

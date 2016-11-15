@@ -11,25 +11,40 @@ from player import *
 from font import *
 from lobbymenu import *
 from mapmenu import *
+from fightmenu import *
 
 # Pygame
 players = {}
 menus = [
   LobbyMenu(players),
   MapMenu(players),
+  FightMenu(players),
 ]
-currMenu = 0
+# Constants for determining which menu to use
+LOBBY_MENU = 0
+MAP_MENU = 1
+FIGHT_MENU = 2
+
+currMenu = LOBBY_MENU
 sockClient = None
 
 def toMapMenu():
   global currMenu, playersCanJoin
-  currMenu = 1
+  currMenu = MAP_MENU
   playersCanJoin = False
 
 def toLobbyMenu():
   global currMenu, playersCanJoin
-  currMenu = 0
+  currMenu = LOBBY_MENU
   playersCanJoin = True
+
+def toFightMenu():
+  global currMenu
+  index = menus[MAP_MENU].selectedMap
+  currMapBlob = menus[MAP_MENU].maps[index].blob
+  menus[FIGHT_MENU].loadMap(blob)
+  currMenu = FIGHT_MENU
+  menus[FIGHT_MENU].start()
 
 currTime = time.time()
 gameRunning = True
@@ -39,14 +54,17 @@ playersCanJoin = True
 def onKeyPress(key):
   global currMenu, menus
   menus[currMenu].keyDown(key)
-  if currMenu == 0:
+  if currMenu == LOBBY_MENU:
     if key == pygame.K_SPACE and len(players) > 0:
       toMapMenu()
 
-  if currMenu == 1:
-    if key == pygame.K_ESCAPE and len(players) > 0:
+  elif currMenu == MAP_MENU:
+    if key == pygame.K_ESCAPE:
       toLobbyMenu()
 
+  elif currMenu == FIGHT_MENU:
+    if key == pygame.K_SPACE:
+      toFightMenu()
 
 # When a key is released
 def onKeyRelease(key):

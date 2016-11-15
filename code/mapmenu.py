@@ -57,19 +57,13 @@ class MapMenu(GameMenu):
       (WIDTH/2 - font.get_width()/2 - self.translateOffset * 50, 5)
     )
 
-    # Render icons
+    # Render icons for the maps, 2 to the left, 2 to the right
     numMaps = len(self.maps)
     for i in range(5):
       index = (i + self.selectedMap - 2 + numMaps) % numMaps
-      icon = self.maps[index].icon
-
-      if i == 0:
-        icon = icon.copy()
-        icon.set_alpha(min(abs(self.translateOffset * 255), 255))
 
       self.maps[index].render(
         screen,
-        icon,
         (
           WIDTH/2 - (-i + 2 + self.translateOffset) * 250,
           HEIGHT*3/4
@@ -111,10 +105,11 @@ class MapPreview:
     self.preview = load("map/" + blob["preview"])
     self.icon = load("map/" + blob["icon"])
 
-  def render(self, screen, icon, pos):
-    width = icon.get_width()
-    height = icon.get_height()
-    screen.blit(icon, (
+  # Render the icon for the map
+  def render(self, screen, pos):
+    width = self.icon.get_width()
+    height = self.icon.get_height()
+    screen.blit(self.icon, (
       pos[0] - width/2,
       pos[1] - height/2,
       width,
