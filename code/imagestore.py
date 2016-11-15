@@ -86,6 +86,9 @@ faces = [
 # Torso Images
 torsos = [
   load("torso/torso_base.png")
+  load("torso/torso_angelbeats.png")
+  load("torso/torso_angelbeats_tachibana.png")
+  load("torso/torso_shakunetsu.png")
 ]
 
 def generateFace(index=-1):
