@@ -9,6 +9,7 @@ class Player():
   theta = math.pi / 2
   smoothTheta = math.pi / 2
   dist = 0
+  smoothDist = 0
   attacking = False
   hasAttacked = False
   lastAttack = 0
@@ -21,6 +22,14 @@ class Player():
     self.conn = conn
     self.id = id
     self.faceid = sampleIndex(faces)
+    self.face = generateFace(self.faceid)
+    self.torso = generateTorso()
+
+  def setLocation(self, theta, dist):
+    self.theta = theta
+    self.dist = dist
+
+  def sendFace(self):
     self.conn.send(json.dumps({
       'id': self.id,
       'blob': {
@@ -31,32 +40,30 @@ class Player():
       }
     }) + "\n")
     print('sent face' + str(self.faceid))
-    self.face = generateFace(self.faceid)
-    self.torso = generateTorso()
-
-  def setLocation(self, theta, dist):
-    self.theta = theta
-    self.dist = dist
 
   # Called when a player taps the screen
   def startAttack(self):
-    self.lastAttack = time.time()
-    if self.dist < 0.1:
+    vert = math.sin(self.theta) * self.dist
+    if vert > 0:
       self.tryJumping()
-    elif abs(math.cos(self.theta) * self.dist) > 0.1:
+    else:
+      self.lastAttack = time.time()
       self.attacking = True
       self.hasAttacked = False
 
   def tryJumping(self):
+    print("Trying to jump")
     self.jumping = True
 
   def createBody(self, space, position):
     self.space = space
-    self.body = pymunk.Body(5, 1)
-    self.body.position = position[0], position[1]
+    self.body = pymunk.Body(5, pymunk.inf)
+    self.body.position = position[0], HEIGHT-position[1]
     self.poly = pymunk.Circle(self.body, self.radius)
     self.poly.friction = 0.1
+    self.poly.collision_type = 1
     self.body.damping = 0.8
+    self.space.add(self.body, self.poly)
 
   # Used to detect collisions between player and ground
   def raycastCallback(self, ray):
@@ -83,12 +90,16 @@ class Player():
       math.cos(self.smoothTheta or 0) + math.cos(self.theta or 0) * 5 * deltaTime
     )
 
+    self.smoothDist += (self.dist-self.smoothDist) * deltaTime * 5
+
     # Do raycasting to check for collisions beneath player
     self.body.each_arbiter(lambda ray: self.raycastCallback(ray))
 
     grounded = self.raycast_body != None and abs(self.raycast_normal.x / self.raycast_normal.y) < -PLAYER_GROUND_ACCEL/self.space.gravity.y
 
     if grounded and self.jumping:
+      print("Jumping!")
+
       jumpVelocity = math.sqrt(2.0 * JUMP_HEIGHT * abs(GRAVITY))
       impulse = (0, self.body.mass * jumpVelocity)
       self.body.apply_impulse_at_local_point(impulse)
@@ -98,12 +109,10 @@ class Player():
     self.direction = self.body.velocity.x > 0
 
     vx = 0
-    magnitude = math.cos(self.theta) * self.dist
+    magnitude = math.cos(self.theta) * self.smoothDist
 
     if abs(magnitude) > 0.1:
-      vx = PLAYER_VELOCITY
-      if magnitude < 0:
-        vx *= -1
+      vx = PLAYER_VELOCITY * magnitude
 
     self.poly.surface_velocity = -vx, 0
 
@@ -120,40 +129,51 @@ class Player():
 
   def render(self, screen):
     x = int(self.body.position[0])
-    y = int(-self.body.position[1] + HEIGHT)
-    print(str(x) + "," + str(y))
+    y = int(HEIGHT-self.body.position[1])
 
     pygame.draw.circle(screen, (255, 0, 0), (x, y), self.radius)
 
     legHeight = 30 - self.radius
     neckLength = 20
 
+    faceRight = self.body.velocity.x > 0
+
     # Draw Torso
     torsoWidth = self.torso.get_width()
     torsoHeight = self.torso.get_height()
-    screen.blit(self.torso, (
-      x - torsoWidth / 2,
-      y - torsoHeight - legHeight,
-      torsoWidth,
-      torsoHeight
-    ))
+    screen.blit(
+      pygame.transform.flip(self.torso, faceRight, False),
+      (
+        x - torsoWidth / 2,
+        y - torsoHeight - legHeight,
+        torsoWidth,
+        torsoHeight
+      )
+    )
 
     # Draw Face
+    theta = self.smoothTheta
+    if faceRight:
+      theta *= -1
+      theta += math.pi
     faceSurface = pygame.transform.rotate(
       self.face,
-      - self.smoothTheta / math.pi * 180 + 90
+      - theta / math.pi * 180 + 90
     )
 
     faceWidth = faceSurface.get_width()
     faceHeight = faceSurface.get_height()
     faceOffsetX = math.cos(self.smoothTheta + math.pi) * neckLength
     faceOffsetY = math.sin(self.smoothTheta + math.pi) * neckLength
-    screen.blit(faceSurface, (
-      x - faceWidth / 2 + faceOffsetX,
-      y - 160 - faceHeight / 2 - legHeight + faceOffsetY,
-      faceWidth,
-      faceHeight
-    ))
+    screen.blit(
+      pygame.transform.flip(faceSurface, faceRight, False),
+      (
+        x - faceWidth / 2 + faceOffsetX,
+        y - 160 - faceHeight / 2 - legHeight + faceOffsetY,
+        faceWidth,
+        faceHeight
+      )
+    )
 
 
 class LobbyPlayer():
@@ -168,7 +188,6 @@ class LobbyPlayer():
     #self.body.damping = 0.8
     self.theta = parentPlayer.theta
     self.dist = parentPlayer.dist
-    self.poly.collision_type = 1
     space.add(self.body, self.poly)
 
   def tick(self, deltaTime):

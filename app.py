@@ -64,6 +64,10 @@ def onKeyPress(key):
     if key == pygame.K_SPACE:
       toFightMenu()
 
+  elif currMenu == FIGHT_MENU:
+    if key == pygame.K_ESCAPE:
+      toLobbyMenu()
+
 # When a key is released
 def onKeyRelease(key):
   global currMenu, menus
@@ -134,7 +138,7 @@ def ServerThread():
       gameRunning = False
       break
     data += resp
-    print("Got: " + str(resp))
+    #print("Got: " + str(resp))
     messages = data.split("\n")
     data = messages[-1]
     for msg in messages[:-1]:
@@ -151,6 +155,11 @@ def ServerThread():
       # Handle creating new players
       if (blob['type'] == 'connect' or not players.get(blob['id'])) and playersCanJoin: # handle new players
         players[blob['id']] = Player(blob['id'], sockClient)
+        players[blob['id']].sendFace()
+
+      # Send the player's face if they already were connected
+      if blob['type'] == 'connect' and players.get(blob['id']) and not playersCanJoin:
+        players[blob['id']].sendFace()
 
       if not players[blob['id']]:
         continue

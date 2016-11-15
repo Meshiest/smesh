@@ -36,9 +36,17 @@ class FightMenu(GameMenu):
       if not self.players.get(id): continue
       self.players[id].render(screen)
 
+    for line in self.staticLines:
+      pygame.draw.line(screen, (255, 0, 0), line[0], line[1], 5)
+
+    for line in self.platformLines:
+      pygame.draw.line(screen, (255, 255, 0), line[0], line[1], 5)
+
+
+
     # Render the foreground
-    #if self.mapForeground:
-    #  screen.blit(self.mapForeground, (0, 0, WIDTH, HEIGHT))
+    if self.mapForeground:
+      screen.blit(self.mapForeground, (0, 0, WIDTH, HEIGHT))
 
   # Load in map information from the json blob
   def loadMap(self, blob):
@@ -46,16 +54,19 @@ class FightMenu(GameMenu):
     self.mapMiddleground = load("map/" + blob["middleground"])
     self.mapBackground = load("map/" + blob["background"])
 
-    self.statics = blob["segments_static"]
-    self.platforms = blob["segments_platform"]
+    self.staticLines = self.statics = blob["segments_static"]
+    self.platformLines = self.platforms = blob["segments_platform"]
     self.spawnpoints = blob["spawnpoints"]
     self.hasInit = False
 
   def createSegment(self, seg, isPlatform):
+    seg = [(seg[0][0], HEIGHT - seg[0][1]),
+           (seg[1][0], HEIGHT - seg[1][1])]
+
     segment = pymunk.Segment(self.space.static_body, seg[0], seg[1], 5)
-    segment.friction = 1
+    segment.friction = 1.
+    print("Creating " + str(isPlatform and "platform" or "static") + " at " + str(seg))
     if isPlatform:
-      segment.friction = 1.
       segment.collision_type = 2
       segment.filter = pymunk.ShapeFilter(categories=0b1000)
     else:
@@ -102,4 +113,5 @@ class FightMenu(GameMenu):
 
 # For platforms that let players jump through them
 def passthrough_handler(arbiter, space, data):
+  print("Raycasting")
   return arbiter.shapes[0].body.velocity.y < 0
