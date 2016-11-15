@@ -1,0 +1,14 @@
+{
+  "name": "MAP SENPAI",
+  "preview": "demo2_preview.png",
+  "icon": "demo2_icon.png",
+  "foreground": "",
+  "middleground": "demo2_mg.png",
+  "background": "",
+  "segments": [
+    [[0, 653], [703, 653]],
+    [[703, 653], [703, 900]],
+    [[871, 649], [1600, 649]],
+    [[871, 649], [871, 900]]
+  ]
+}
