@@ -16,9 +16,6 @@ class LobbyMenu(GameMenu):
     self.space = pymunk.Space() 
     self.space.gravity = 0,GRAVITY
 
-    self.body = pymunk.Body(body_type=pymunk.Body.STATIC)
-    self.body.position = (0, 0)
-
     minDim = min(WIDTH, HEIGHT)/2 + 5
     mapVerts = [(- minDim, HEIGHT)]
 
@@ -37,7 +34,7 @@ class LobbyMenu(GameMenu):
     for i in range(len(mapVerts)):
       vert = mapVerts[i]
       nextVert = mapVerts[(i+1)%len(mapVerts)]
-      line = pymunk.Segment(self.body, vert, nextVert, 5)
+      line = pymunk.Segment(self.space.static_body, vert, nextVert, 5)
       line.friction = 0.4
       self.lines.append(line)
 

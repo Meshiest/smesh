@@ -1,6 +1,6 @@
 import pygame, math, json
 from constants import *
-from gamemenu import *
+from gamemenu  import *
 from font import *
 from imagestore import *
 
@@ -39,10 +39,9 @@ class MapMenu(GameMenu):
         HEIGHT/2
       )
     )
-
+    
     # Fill the bottom half
     pygame.draw.rect(screen, (0, 0, 0), (0, HEIGHT/2, WIDTH, HEIGHT/2))
-
 
     # Render Map Name and overlay
     font = self.maps[self.selectedMap].font

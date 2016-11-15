@@ -1,14 +1,21 @@
 import time, pygame, random, math, pymunk, json
+from pymunk.vec2d import Vec2d
 from constants import *
 from imagestore import *
+from utils import *
 
 class Player():
   id = -1
-  theta = 0
+  theta = math.pi / 2
+  smoothTheta = math.pi / 2
   dist = 0
   attacking = False
+  hasAttacked = False
   lastAttack = 0
+  jumping = False
   lobbyPlayer = None
+  direction = False
+  radius = 50
 
   def __init__(self, id, conn):
     self.conn = conn
@@ -25,21 +32,129 @@ class Player():
     }) + "\n")
     print('sent face' + str(self.faceid))
     self.face = generateFace(self.faceid)
+    self.torso = generateTorso()
 
   def setLocation(self, theta, dist):
     self.theta = theta
     self.dist = dist
 
+  # Called when a player taps the screen
   def startAttack(self):
     self.lastAttack = time.time()
-    self.attacking = True
+    if self.dist < 0.1:
+      self.tryJumping()
+    elif abs(math.cos(self.theta) * self.dist) > 0.1:
+      self.attacking = True
+      self.hasAttacked = False
 
-  def createBody(self, position):
-    pass
+  def tryJumping(self):
+    self.jumping = True
 
-  def gameRender(self, screen):
-    # for later
-    print("Render game")
+  def createBody(self, space, position):
+    self.space = space
+    self.body = pymunk.Body(5, 1)
+    self.body.position = position[0], position[1]
+    self.poly = pymunk.Circle(self.body, self.radius)
+    self.poly.friction = 0.1
+    self.body.damping = 0.8
+
+  # Used to detect collisions between player and ground
+  def raycastCallback(self, ray):
+    contactPoint = ray.contact_point_set
+    normal = -contactPoint.normal
+
+    if normal.y > self.raycast_normal.y:
+      self.raycast_normal = normal
+      self.raycast_penetration = -contactPoint.points[0].distance
+      self.raycast_body = ray.shapes[1].body
+      self.raycast_impulse = ray.total_impulse
+      self.raycast_position = contactPoint.points[0].point_b
+
+
+  def tick(self, deltaTime):
+    self.raycast_normal = Vec2d.zero()
+    self.raycast_penetration = Vec2d.zero()
+    self.raycast_impulse = Vec2d.zero()
+    self.raycast_position = Vec2d.zero()
+    self.raycast_body = None
+
+    self.smoothTheta = math.atan2(
+      math.sin(self.smoothTheta or 0) + math.sin(self.theta or 0) * 5 * deltaTime,
+      math.cos(self.smoothTheta or 0) + math.cos(self.theta or 0) * 5 * deltaTime
+    )
+
+    # Do raycasting to check for collisions beneath player
+    self.body.each_arbiter(lambda ray: self.raycastCallback(ray))
+
+    grounded = self.raycast_body != None and abs(self.raycast_normal.x / self.raycast_normal.y) < -PLAYER_GROUND_ACCEL/self.space.gravity.y
+
+    if grounded and self.jumping:
+      jumpVelocity = math.sqrt(2.0 * JUMP_HEIGHT * abs(GRAVITY))
+      impulse = (0, self.body.mass * jumpVelocity)
+      self.body.apply_impulse_at_local_point(impulse)
+      self.jumping = False
+
+    # Direction player is facing
+    self.direction = self.body.velocity.x > 0
+
+    vx = 0
+    magnitude = math.cos(self.theta) * self.dist
+
+    if abs(magnitude) > 0.1:
+      vx = PLAYER_VELOCITY
+      if magnitude < 0:
+        vx *= -1
+
+    self.poly.surface_velocity = -vx, 0
+
+    if self.raycast_body != None:
+      self.poly.friction = -PLAYER_GROUND_ACCEL / GRAVITY
+    else:
+      self.poly.friction = 0
+      # Air movement
+      self.body.velocity.x = lerp(self.body.velocity.x, vx, PLAYER_AIR_ACCEL * deltaTime)
+
+    # Falling max speed
+    self.body.velocity.y = max(self.body.velocity.y, -FALL_VELOCITY)
+
+
+  def render(self, screen):
+    x = int(self.body.position[0])
+    y = int(-self.body.position[1] + HEIGHT)
+    print(str(x) + "," + str(y))
+
+    pygame.draw.circle(screen, (255, 0, 0), (x, y), self.radius)
+
+    legHeight = 30 - self.radius
+    neckLength = 20
+
+    # Draw Torso
+    torsoWidth = self.torso.get_width()
+    torsoHeight = self.torso.get_height()
+    screen.blit(self.torso, (
+      x - torsoWidth / 2,
+      y - torsoHeight - legHeight,
+      torsoWidth,
+      torsoHeight
+    ))
+
+    # Draw Face
+    faceSurface = pygame.transform.rotate(
+      self.face,
+      - self.smoothTheta / math.pi * 180 + 90
+    )
+
+    faceWidth = faceSurface.get_width()
+    faceHeight = faceSurface.get_height()
+    faceOffsetX = math.cos(self.smoothTheta + math.pi) * neckLength
+    faceOffsetY = math.sin(self.smoothTheta + math.pi) * neckLength
+    screen.blit(faceSurface, (
+      x - faceWidth / 2 + faceOffsetX,
+      y - 160 - faceHeight / 2 - legHeight + faceOffsetY,
+      faceWidth,
+      faceHeight
+    ))
+
 
 class LobbyPlayer():
   radius = 50
@@ -50,10 +165,10 @@ class LobbyPlayer():
     self.body = pymunk.Body(1, 1)
     self.body.position = (random.random() - 0.5) * WIDTH / 4, HEIGHT/2
     self.poly = pymunk.Circle(self.body, self.radius)
-    self.poly.friction = 0.2
-    self.body.damping = 0.9
+    #self.body.damping = 0.8
     self.theta = parentPlayer.theta
     self.dist = parentPlayer.dist
+    self.poly.collision_type = 1
     space.add(self.body, self.poly)
 
   def tick(self, deltaTime):

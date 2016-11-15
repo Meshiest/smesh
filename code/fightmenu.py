@@ -1,4 +1,5 @@
 import pygame, math, pymunk
+from pymunk.vec2d import Vec2d
 from gamemenu import *
 from constants import *
 from player import *
@@ -13,19 +14,53 @@ class FightMenu(GameMenu):
     self.hasInit = False
 
   def tick(self, deltaTime):
-    pass
+    # Tick all the players
+    keys = self.players.keys()
+    for id in keys:
+      if not self.players.get(id): continue
+      self.players[id].tick(deltaTime)
+
+    # Step the physics space
+    self.space.step(deltaTime)
 
   def render(self, screen):
-    pass
+    # Render the background and middleground
+    if self.mapBackground:
+      screen.blit(self.mapBackground, (0, 0, WIDTH, HEIGHT))
+    if self.mapMiddleground:
+      screen.blit(self.mapMiddleground, (0, 0, WIDTH, HEIGHT))
+
+    # Render all the players
+    keys = self.players.keys()
+    for id in keys:
+      if not self.players.get(id): continue
+      self.players[id].render(screen)
+
+    # Render the foreground
+    #if self.mapForeground:
+    #  screen.blit(self.mapForeground, (0, 0, WIDTH, HEIGHT))
 
   # Load in map information from the json blob
   def loadMap(self, blob):
     self.mapForeground = load("map/" + blob["foreground"])
-    self.mapBackground = load("map/" + blob["background"])
     self.mapMiddleground = load("map/" + blob["middleground"])
-    self.segments = blob["segments"]
-    self.spawnponts = blob["spawnpoints"]
+    self.mapBackground = load("map/" + blob["background"])
+
+    self.statics = blob["segments_static"]
+    self.platforms = blob["segments_platform"]
+    self.spawnpoints = blob["spawnpoints"]
     self.hasInit = False
+
+  def createSegment(self, seg, isPlatform):
+    segment = pymunk.Segment(self.space.static_body, seg[0], seg[1], 5)
+    segment.friction = 1
+    if isPlatform:
+      segment.friction = 1.
+      segment.collision_type = 2
+      segment.filter = pymunk.ShapeFilter(categories=0b1000)
+    else:
+      segment.group = 1
+    return segment
 
   def start(self):
     # Don't let the fight menu init itself twice on the same map
@@ -35,23 +70,27 @@ class FightMenu(GameMenu):
     # Create a physics space for the map
     self.space = pymunk.Space() 
     self.space.gravity = 0,GRAVITY
-    self.body = pymunk.Body(body_type=pymunk.Body.STATIC)
-    self.body.position = (0, 0)
+    self.space.add_collision_handler(1,2).begin = passthrough_handler
 
     # Create segments from the json blob
-    self.segments = map(
-      lambda seg: pymunk.Segment(self.body, seg[0], seg[1], 5),
-      self.segments
+    self.statics = map(
+      lambda seg: self.createSegment(seg, False),
+      self.statics
+    )
+    self.platforms = map(
+      lambda seg: self.createSegment(seg, True),
+      self.platforms
     )
 
     # Add the segments to the world
-    space.add(self.segments)
+    self.space.add(self.statics)
+    self.space.add(self.platforms)
 
-    # Create each player physics object
+    # Create each player physics object at the spawnpoints
     keys = self.players.keys()
     for id in keys:
       if not self.players.get(id): continue
-      self.players[id].lobbyPlayer = LobbyPlayer(self.players[id], self.space)
+      self.players[id].createBody(self.space, sample(self.spawnpoints))
 
     self.hasInit = True
 
@@ -60,3 +99,7 @@ class FightMenu(GameMenu):
   
   def keyUp(self, key):
     pass
+
+# For platforms that let players jump through them
+def passthrough_handler(arbiter, space, data):
+  return arbiter.shapes[0].body.velocity.y < 0

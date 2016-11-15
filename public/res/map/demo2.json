@@ -5,7 +5,9 @@
   "foreground": "",
   "middleground": "demo2_mg.png",
   "background": "",
-  "segments": [
+  "segments_platform": [
+  ],
+  "segments_static": [
     [[0, 653], [703, 653]],
     [[703, 653], [703, 900]],
     [[871, 649], [1600, 649]],

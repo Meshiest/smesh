@@ -41,7 +41,7 @@ def toLobbyMenu():
 def toFightMenu():
   global currMenu
   index = menus[MAP_MENU].selectedMap
-  currMapBlob = menus[MAP_MENU].maps[index].blob
+  blob = menus[MAP_MENU].maps[index].blob
   menus[FIGHT_MENU].loadMap(blob)
   currMenu = FIGHT_MENU
   menus[FIGHT_MENU].start()
@@ -61,8 +61,6 @@ def onKeyPress(key):
   elif currMenu == MAP_MENU:
     if key == pygame.K_ESCAPE:
       toLobbyMenu()
-
-  elif currMenu == FIGHT_MENU:
     if key == pygame.K_SPACE:
       toFightMenu()
 
@@ -89,7 +87,7 @@ def gameLoop():
 
   # Get current unix time
   lastTime, currTime = currTime, time.time()
-  deltaTime = currTime - lastTime
+  deltaTime = min(currTime - lastTime, 0.1)
 
   keys = pygame.key.get_pressed()
   for event in pygame.event.get():
@@ -121,6 +119,11 @@ def ServerThread():
 
   sockClient = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
   sockClient.connect((TCP_HOST, TCP_PORT))
+
+  # Create fake players for debugging
+  #for i in range(-1, -6, -1):
+  #  players[i] = Player(i, sockClient)
+
   sockClient.send(json.dumps({
     "action": "start"
   }) + "\n")
