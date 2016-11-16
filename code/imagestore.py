@@ -94,6 +94,13 @@ torsos = [
   load("torso/torso_dress.png"),
   load("torso/torso_underwear.png"),
   load("torso/torso_clannad_winter.png"),
+  load("torso/torso_clannad_summer.png"),
+  load("torso/torso_nichijou.png"),
+]
+
+# Foot Images
+feet = [
+  load("foot/foot_bare.png"),
 ]
 
 def generateFace(index=-1):

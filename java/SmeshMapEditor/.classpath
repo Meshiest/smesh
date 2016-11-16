@@ -6,5 +6,6 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="C:/Program Files (x86)/Java/jre1.8.0_73"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="C:/Users/Isaac/Desktop/Smesh/java/SmeshMapEditor/lib/java-json.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

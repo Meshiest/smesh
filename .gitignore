@@ -1,4 +1,6 @@
 Thumbs.db
 code/*.pyc
 java/.metadata/*
+java/.recommenders/*
+java/SmeshMapEditor/.settings/*
 java/SmeshMapEditor/bin/

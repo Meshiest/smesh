@@ -19,7 +19,7 @@ public class Main extends JFrame implements ActionListener{
   
   public File smeshPath;
   
-  public JMenuItem saveItem, openItem, setFG, setBG, setMG, reloadImages;
+  public JMenuItem saveItem, openItem, setFG, setBG, setMG, reloadImages, setPreview, setIcon;
   public JButton showFG, showBG, showMG, showSpawns, showPlatforms, showStatics;
   
   public EditPane editPane;
@@ -65,6 +65,16 @@ public class Main extends JFrame implements ActionListener{
     setBG.addActionListener(this);
     setBG.setMnemonic('b');
     editMenu.add(setBG);
+    
+    setPreview = new JMenuItem("Set Preview");
+    setPreview.addActionListener(this);
+    setPreview.setMnemonic('p');
+    editMenu.add(setPreview);
+    
+    setIcon = new JMenuItem("Set Icon");
+    setIcon.addActionListener(this);
+    setIcon.setMnemonic('i');
+    editMenu.add(setIcon);
     
     reloadImages = new JMenuItem("Reload Images");
     reloadImages.addActionListener(this);
@@ -159,6 +169,22 @@ public class Main extends JFrame implements ActionListener{
       editPane.middleground = editPane.loadImageFromFile(editPane.middlegroundFile);
     }
     
+    if (obj.equals(setPreview)) {
+      editPane.previewFile = showSelector(true, false);
+      editPane.preview = editPane.loadImageFromFile(editPane.previewFile);
+    }
+    
+    if (obj.equals(setIcon)) {
+      editPane.iconFile = showSelector(true, false);
+      editPane.icon = editPane.loadImageFromFile(editPane.iconFile);
+    }
+    
+    if (obj.equals(reloadImages)) {
+      editPane.reloadImages();
+    }
+    
+
+    
     if(obj.equals(openItem)) {
       File loadFile = showSelector(false, false);
       if(loadFile != null) {
@@ -182,9 +208,9 @@ public class Main extends JFrame implements ActionListener{
     chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
     int result;
     if(saving)
-      result = chooser.showOpenDialog(null);
-    else
       result = chooser.showSaveDialog(null);
+    else
+      result = chooser.showOpenDialog(null);
     
     if(result == JFileChooser.APPROVE_OPTION)
       return chooser.getSelectedFile();

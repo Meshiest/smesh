@@ -15,13 +15,18 @@ import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
-import org.json.*;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 
 @SuppressWarnings("serial")
 public class EditPane extends JPanel implements Runnable, MouseListener, KeyListener, MouseMotionListener, MouseWheelListener {
@@ -37,8 +42,8 @@ public class EditPane extends JPanel implements Runnable, MouseListener, KeyList
   
   public boolean showFG, showBG, showMG, showSpawns, showStatics, showPlatforms;
   
-  public File foregroundFile, backgroundFile, middlegroundFile;
-  public BufferedImage foreground, background, middleground, transparencyBG;
+  public File foregroundFile, backgroundFile, middlegroundFile, previewFile, iconFile;
+  public BufferedImage foreground, background, middleground, transparencyBG, preview, icon;
   
   public double offsetX, offsetY;
   
@@ -46,6 +51,7 @@ public class EditPane extends JPanel implements Runnable, MouseListener, KeyList
   public Point lastDrag, dragStart;
   public int dragType, lastClickType;
   public long lastClick;
+  public String mapName;
   
   public Point selectedPoint;
   
@@ -86,6 +92,8 @@ public class EditPane extends JPanel implements Runnable, MouseListener, KeyList
     showSpawns = true;
     showPlatforms = true;
     showStatics = true;
+    
+    mapName = "Unnamed";
     
     zoom = 0.5;
     offsetX = 0;
@@ -134,7 +142,43 @@ public class EditPane extends JPanel implements Runnable, MouseListener, KeyList
   }
   
   public void loadJSON(File jsonFile) {
-    JSONObject obj = new JSONObject(jsonFile);
+    reset();
+    try {
+      FileInputStream fis = new FileInputStream(jsonFile);
+      byte[] data = new byte[(int) jsonFile.length()];
+      fis.read(data);
+      fis.close();
+      JSONObject obj = new JSONObject(new String(data, "UTF-8"));
+      
+      mapName = obj.getString("name");
+      previewFile = loadFile(obj.getString("preview"));
+      iconFile = loadFile(obj.getString("icon"));
+      foregroundFile = loadFile(obj.getString("foreground"));
+      middlegroundFile = loadFile(obj.getString("middleground"));
+      backgroundFile = loadFile(obj.getString("background"));
+      
+      platforms = Segment.fromJSONArray(obj.getJSONArray("segments_platform"));
+      statics = Segment.fromJSONArray(obj.getJSONArray("segments_static"));
+      JSONArray spawnObjs = obj.getJSONArray("spawnpoints");
+      for(int i = 0; i < spawnObjs.length(); i++) {
+        JSONArray spawn = spawnObjs.getJSONArray(i);
+        spawns.add(new Point(spawn.getInt(0), spawn.getInt(1)));
+      }
+      
+      reloadImages();
+      
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+  
+  public File loadFile(String path) {
+    if(path.length() == 0)
+      return null;
+    File file = new File(main.smeshPath.getAbsolutePath() + "/public/res/img/map/" + path);
+    if(!file.exists())
+      return null;
+    return file;
   }
   
   public BufferedImage loadImageFromFile(File file) {
@@ -146,6 +190,14 @@ public class EditPane extends JPanel implements Runnable, MouseListener, KeyList
       e.printStackTrace();
       return null;
     }
+  }
+  
+  public void reloadImages() {
+    foreground = loadImageFromFile(foregroundFile);
+    background = loadImageFromFile(backgroundFile);
+    middleground = loadImageFromFile(middlegroundFile);
+    icon = loadImageFromFile(iconFile);
+    preview = loadImageFromFile(previewFile);
   }
   
   public void paintComponent(Graphics graphics) {
