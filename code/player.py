@@ -54,7 +54,6 @@ class Player():
       self.hasAttacked = False
 
   def tryJumping(self):
-    print("Trying to jump")
     self.jumping = True
 
   def createBody(self, space, position):
@@ -102,14 +101,14 @@ class Player():
     grounded = self.raycast_body != None and abs(self.raycast_normal.x / self.raycast_normal.y) < -PLAYER_GROUND_ACCEL/self.space.gravity.y
 
     if grounded:
-      self.footTheta += abs(self.body.velocity.x) * 0.001 * deltaTime
+      self.footTheta += self.body.velocity.x * 0.1 * deltaTime + math.pi * 2
+    elif self.jumping:
+      self.jumping = False
+
 
     self.footTheta %= math.pi * 2
-    if self.footTheta > 0.1:
-      self.footTheta -= math.pi * 10 * deltaTime
 
     if grounded and self.jumping:
-      print("Jumping!")
 
       jumpVelocity = math.sqrt(2.0 * JUMP_HEIGHT * abs(GRAVITY))
       impulse = (0, self.body.mass * jumpVelocity)
@@ -170,7 +169,7 @@ class Player():
     screen.blit(
       leftFoot,
       (
-        x - footWidth / 2 + torsoWidth / 5 * rightMult * math.cos(self.footTheta),
+        x - footWidth / 2 + torsoWidth / 5 * math.cos(self.footTheta),
         y - legHeight + footHeight / 2 * math.sin(self.footTheta),
         footWidth,
         footHeight
@@ -179,7 +178,7 @@ class Player():
     screen.blit(
       leftFoot,
       (
-        x - footWidth / 2 + torsoWidth / 5 * rightMult * math.cos(self.footTheta + math.pi),
+        x - footWidth / 2 + torsoWidth / 5 * math.cos(self.footTheta + math.pi),
         y - legHeight + footHeight / 2 * math.sin(self.footTheta + math.pi),
         footWidth,
         footHeight

@@ -113,5 +113,4 @@ class FightMenu(GameMenu):
 
 # For platforms that let players jump through them
 def passthrough_handler(arbiter, space, data):
-  print("Raycasting")
   return arbiter.shapes[0].body.velocity.y < 0
