@@ -17,10 +17,12 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import org.json.JSONArray;
@@ -168,6 +170,36 @@ public class EditPane extends JPanel implements Runnable, MouseListener, KeyList
       reloadImages();
       
     } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+  
+  public void saveJSON(File jsonFile) {
+    try {
+      JSONObject obj = new JSONObject();
+      obj.put("name", mapName);
+      obj.put("preview", previewFile.getName());
+      obj.put("icon", iconFile.getName());
+      obj.put("foreground", foregroundFile == null ? "" : foregroundFile.getName());
+      obj.put("middleground", middlegroundFile == null ? "" : middlegroundFile.getName());
+      obj.put("background", backgroundFile == null ? "" : backgroundFile.getName());
+      obj.put("segments_platform", Segment.toJSONArray(platforms));
+      obj.put("segments_static", Segment.toJSONArray(statics));
+      JSONArray spawnpointArr = new JSONArray();
+      for(int i = 0; i < spawns.size(); i++) {
+        JSONArray posArr = new JSONArray();
+        Point spawn = spawns.get(i);
+        posArr.put(spawn.x);
+        posArr.put(spawn.y);
+        spawnpointArr.put(posArr);
+      }
+      obj.put("spawnpoints", spawnpointArr);
+      String output = obj.toString(2);
+      FileOutputStream fos = new FileOutputStream(jsonFile);
+      fos.write(output.getBytes());
+      fos.close();
+    } catch (Exception e) {
+      JOptionPane.showMessageDialog(this, "Error Saving!");
       e.printStackTrace();
     }
   }

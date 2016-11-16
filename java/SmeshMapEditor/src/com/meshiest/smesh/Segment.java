@@ -42,4 +42,21 @@ public class Segment {
     }
     return segs;
   }
+  
+  public static JSONArray toJSONArray(ArrayList<Segment> segments) {
+    JSONArray arr = new JSONArray();
+    for(int i = 0; i < segments.size(); i++) {
+      JSONArray posArr = new JSONArray(), pointA = new JSONArray(), pointB = new JSONArray();
+      Segment seg = segments.get(i);
+      pointA.put(seg.a.x);
+      pointA.put(seg.a.y);
+      pointB.put(seg.b.x);
+      pointB.put(seg.b.y);
+      posArr.put(pointA);
+      posArr.put(pointB);
+      System.out.println(i+"ok");
+      arr.put(posArr);
+    }
+    return arr;
+  }
 }

@@ -12,6 +12,7 @@ import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 @SuppressWarnings("serial")
@@ -190,6 +191,21 @@ public class Main extends JFrame implements ActionListener{
       if(loadFile != null) {
         editPane.loadJSON(loadFile);
       }
+    }
+    
+    if(obj.equals(saveItem)) {
+      File loadFile = showSelector(false, true);
+      boolean shouldOverwrite = false;
+      if(loadFile == null)
+        return;
+      
+      if(loadFile.exists())
+        shouldOverwrite = JOptionPane.showConfirmDialog(this, "Do you want to overwrite this file?") == JOptionPane.OK_OPTION;
+      else
+        shouldOverwrite = true;
+      
+      if(shouldOverwrite)
+        editPane.saveJSON(loadFile);
     }
       
   }
