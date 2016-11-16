@@ -13,10 +13,7 @@ server = Flask(__name__, static_folder='public', static_url_path='/public')
 server.secret_key = 'lol this is a secret key'
 redis_store = FlaskRedis(server)
 
-redis_store.set("userIds", 0)
-print("ids at " + redis_store.get("userIds"))
-redis_store.set("userIds", int(redis_store.get("userIds")) + 1)
-print("ids at " + redis_store.get("userIds"))
+redis_store.set("userIds", 1)
 
 # Root route to render index
 @server.route("/")
@@ -53,7 +50,6 @@ def io_location(blob):
 
 @socketio.on('attack')
 def io_attack():
-  print("attack")
   # Tell game the user attacked
   sendMsg({
     "id": session["userId"],
@@ -64,6 +60,11 @@ def io_attack():
 def io_connect():
   print('Client connected')
   emit('nextLocation')
+  if session.get("userId") == None:
+    userId = int(redis_store.get("userIds"))
+    print(str(userId) + " id")
+    session["userId"] = userId
+    redis_store.set("userIds", str(userId))
 
   if session.get('face') != None:
     emit('face', {'face': session['face']})
