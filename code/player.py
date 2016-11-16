@@ -16,7 +16,7 @@ class Player():
   jumping = False
   lobbyPlayer = None
   direction = False
-  radius = 50
+  radius = 30
   footTheta = 0
 
   def __init__(self, id, conn):
@@ -26,6 +26,7 @@ class Player():
     self.face = generateFace(self.faceid)
     self.torso = generateTorso()
     self.foot = generateFoot()
+    self.weapon = generateWeapon()
 
   def setLocation(self, theta, dist):
     if theta != None:
@@ -48,7 +49,7 @@ class Player():
   # Called when a player taps the screen
   def startAttack(self):
     vert = math.sin(self.theta) * self.dist
-    if vert > 0:
+    if vert < 0:
       self.tryJumping()
     else:
       self.lastAttack = time.time()
@@ -147,6 +148,7 @@ class Player():
 
     legHeight = 30 - self.radius
     neckLength = 20
+    armLength = 50
 
     faceRight = abs(self.body.velocity.x) > 10 and self.body.velocity.x > 0
     rightMult = faceRight and -1 or 1
@@ -187,6 +189,7 @@ class Player():
       )
     )
 
+
     # Draw Face
     theta = self.smoothTheta
     if faceRight:
@@ -208,6 +211,38 @@ class Player():
         y - 160 - faceHeight / 2 - legHeight + faceOffsetY,
         faceWidth,
         faceHeight
+      )
+    )
+
+    # Draw Weapon
+    weaponImage = self.weapon['img']
+    handPos = self.weapon['hand']
+    now = time.time()
+    attackMod = now - self.lastAttack < 0.5 and 3 or 1
+    attackTimeMod = now - self.lastAttack < 0.5 and 10 or 1
+    armTheta = (math.cos((now * attackTimeMod + self.id)  % (math.pi * 2))  + 1) * 0.2 * attackMod 
+    weaponImage = pygame.transform.flip(weaponImage, not faceRight, False)
+    weaponWidth = weaponImage.get_width()
+    weaponHeight = weaponImage.get_height()
+    screen.blit(
+      weaponImage, (
+        x - (torsoWidth / 3 + math.cos(armTheta) * armLength) * rightMult - weaponWidth/2,
+        y - torsoHeight + 40 + math.sin(armTheta) * armLength - weaponHeight + handPos[1],
+        weaponWidth, 
+        weaponHeight,
+      )
+    )
+
+    handTheta = (math.cos((now + self.id)  % (math.pi * 2))  + 1) * 0.2 - 1.2
+    screen.blit(
+        pygame.transform.rotate(
+          hand_base,
+          handTheta / math.pi * 180
+        ), (
+        x - (-torsoWidth / 3 - math.cos(-handTheta) * armLength) * rightMult - hand_base.get_width()/2,
+        y - torsoHeight + 40 + math.sin(-handTheta) * armLength - hand_base.get_height()/2,
+        weaponWidth, 
+        weaponHeight,
       )
     )
 

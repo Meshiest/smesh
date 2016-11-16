@@ -48,6 +48,7 @@ var faces = [
   "face_sgdc_katie.png",
   "face_sgdc_nick.png",
   "face_sgdc_noah.png",
+  "face_sgdc_alex.png",
   "face_nichijou_mio.png",
   "face_nichijou_yuuko.png",
   "face_nichijou_mai.png",

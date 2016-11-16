@@ -15,8 +15,7 @@ redis_store = FlaskRedis(server)
 
 redis_store.set('seed', random.randint(0,100000))
 print("Set seed to " + str(redis_store.get("seed")))
-if(redis_store.get("userIds") == None):
-  redis_store.set("userIds", 1)
+redis_store.set("userIds", 1)
 
 # Root route to render index
 @server.route("/")

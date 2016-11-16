@@ -26,6 +26,7 @@ def sampleIndex(arr):
 
 # Base body image
 head_base = load("head_base.png")
+hand_base = load("hand_base.png")
 arm_base = load("arm_base.png")
 leg_base = load("leg_base.png")
 torso_base = load("torso_base.png")
@@ -113,6 +114,27 @@ torsos = [
   load("torso/torso_snk_mikasa.png"),
   load("torso/torso_franken_fran.png"),
   load("torso/torso_oreimo.png"),
+  load("torso/torso_spice_holo.png"),
+  load("torso/torso_miko_mido.png"),
+]
+
+# Weapon Images and Meta
+weapons = [
+  {'img': load('weapons/weapon_boat.png'), 'hand': (50, 150)},
+  {'img': load('weapons/weapon_candycane.png'), 'hand': (60, 150)},
+  {'img': load('weapons/weapon_cardboard.png'), 'hand': (50, 180)},
+  {'img': load('weapons/weapon_cleaver.png'), 'hand': (50, 180)},
+  {'img': load('weapons/weapon_dagger.png'), 'hand': (50, 190)},
+  {'img': load('weapons/weapon_doggy.png'), 'hand': (50, 190)},
+  {'img': load('weapons/weapon_lamp.png'), 'hand': (50, 170)},
+  {'img': load('weapons/weapon_lovestaff.png'), 'hand': (50, 170)},
+  {'img': load('weapons/weapon_maraca.png'), 'hand': (50, 170)},
+  {'img': load('weapons/weapon_pregert.png'), 'hand': (50, 100)},
+  {'img': load('weapons/weapon_pretzal.png'), 'hand': (50, 130)},
+  {'img': load('weapons/weapon_royaldragon.png'), 'hand': (50, 170)},
+  {'img': load('weapons/weapon_scimitar.png'), 'hand': (50, 160)},
+  {'img': load('weapons/weapon_scythe.png'), 'hand': (50, 170)},
+  {'img': load('weapons/weapon_umbrella.png'), 'hand': (50, 170)},
 ]
 
 # Foot Images
@@ -121,7 +143,6 @@ feet = [
 ]
 
 def generateFace(index=-1):
-  global faces
   if index < 0:
     index = sampleIndex(faces)
   surface = pygame.Surface((100, 100), pygame.SRCALPHA, 32).convert_alpha()
@@ -130,7 +151,6 @@ def generateFace(index=-1):
   return surface
 
 def generateTorso():
-  global torsos
   torso = sample(torsos)
   surface = pygame.Surface((100, 150), pygame.SRCALPHA, 32).convert_alpha()
   surface.blit(torso_base, surface.get_rect())
@@ -138,8 +158,17 @@ def generateTorso():
   return surface
 
 def generateFoot():
-  global feet
   foot = sample(feet)
   surface = pygame.Surface((34, 34), pygame.SRCALPHA, 32).convert_alpha()
   surface.blit(foot, surface.get_rect())
   return surface
+
+def generateWeapon():
+  weapon = sample(weapons)
+  surface = pygame.Surface((weapon['img'].get_width(), weapon['img'].get_height()), pygame.SRCALPHA, 32).convert_alpha()
+  surface.blit(weapon['img'], surface.get_rect())
+  handWidth = hand_base.get_width()
+  handHeight = hand_base.get_height()
+  handPos = weapon['hand']
+  surface.blit(hand_base, (handPos[0]-handWidth/2, handPos[1]-handHeight/2, handWidth, handHeight))
+  return {'img': surface, 'hand': (surface.get_width() - handPos[0], surface.get_height() - handPos[1])}

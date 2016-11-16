@@ -77,7 +77,6 @@ class LobbyMenu(GameMenu):
     keys = self.players.keys()
     for id in keys:
       if not self.players.get(id): continue
-      pygame.draw.rect(screen, (255, 255, 0), (id * 50 + 50, 50, 20, 20))
       try:
         if self.players[id].lobbyPlayer:
           self.players[id].lobbyPlayer.render(screen)
