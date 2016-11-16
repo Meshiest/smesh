@@ -17,6 +17,7 @@ class Player():
   lobbyPlayer = None
   direction = False
   radius = 50
+  footTheta = 0
 
   def __init__(self, id, conn):
     self.conn = conn
@@ -24,6 +25,7 @@ class Player():
     self.faceid = sampleIndex(faces)
     self.face = generateFace(self.faceid)
     self.torso = generateTorso()
+    self.foot = generateFoot()
 
   def setLocation(self, theta, dist):
     self.theta = theta
@@ -85,6 +87,8 @@ class Player():
     self.raycast_position = Vec2d.zero()
     self.raycast_body = None
 
+
+
     self.smoothTheta = math.atan2(
       math.sin(self.smoothTheta or 0) + math.sin(self.theta or 0) * 5 * deltaTime,
       math.cos(self.smoothTheta or 0) + math.cos(self.theta or 0) * 5 * deltaTime
@@ -96,6 +100,13 @@ class Player():
     self.body.each_arbiter(lambda ray: self.raycastCallback(ray))
 
     grounded = self.raycast_body != None and abs(self.raycast_normal.x / self.raycast_normal.y) < -PLAYER_GROUND_ACCEL/self.space.gravity.y
+
+    if grounded:
+      self.footTheta += abs(self.body.velocity.x) * 0.001 * deltaTime
+
+    self.footTheta %= math.pi * 2
+    if self.footTheta > 0.1:
+      self.footTheta -= math.pi * 10 * deltaTime
 
     if grounded and self.jumping:
       print("Jumping!")
@@ -131,12 +142,13 @@ class Player():
     x = int(self.body.position[0])
     y = int(HEIGHT-self.body.position[1])
 
-    pygame.draw.circle(screen, (255, 0, 0), (x, y), self.radius)
+    #pygame.draw.circle(screen, (255, 0, 0), (x, y), self.radius)
 
     legHeight = 30 - self.radius
     neckLength = 20
 
-    faceRight = self.body.velocity.x > 0
+    faceRight = abs(self.body.velocity.x) > 10 and self.body.velocity.x > 0
+    rightMult = faceRight and -1 or 1
 
     # Draw Torso
     torsoWidth = self.torso.get_width()
@@ -148,6 +160,29 @@ class Player():
         y - torsoHeight - legHeight,
         torsoWidth,
         torsoHeight
+      )
+    )
+
+    # Draw Feet
+    footWidth = self.foot.get_width()
+    footHeight = self.foot.get_height()
+    leftFoot = pygame.transform.flip(self.foot, faceRight, False)
+    screen.blit(
+      leftFoot,
+      (
+        x - footWidth / 2 + torsoWidth / 5 * rightMult * math.cos(self.footTheta),
+        y - legHeight + footHeight / 2 * math.sin(self.footTheta),
+        footWidth,
+        footHeight
+      )
+    )
+    screen.blit(
+      leftFoot,
+      (
+        x - footWidth / 2 + torsoWidth / 5 * rightMult * math.cos(self.footTheta + math.pi),
+        y - legHeight + footHeight / 2 * math.sin(self.footTheta + math.pi),
+        footWidth,
+        footHeight
       )
     )
 

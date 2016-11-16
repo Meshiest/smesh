@@ -285,6 +285,38 @@ public class EditPane extends JPanel implements Runnable, MouseListener, KeyList
       (int)(900 * zoom),
       null
     );
+    
+    g.setColor(Color.WHITE);
+    g.drawRect(
+      (int)(offsetX * zoom - (800 + 220) * zoom) + width / 2,
+      (int)(offsetY * zoom - 450 * zoom) + height / 2,
+      (int)(200 * zoom),
+      (int)(200 * zoom)
+    );
+    if(icon != null)
+      g.drawImage(icon,
+        (int)(offsetX * zoom - (800 + 220) * zoom) + width / 2,
+        (int)(offsetY * zoom - 450 * zoom) + height / 2,
+        (int)(200 * zoom),
+        (int)(200 * zoom),
+        null
+      );
+    
+    g.drawRect(
+      (int)(offsetX * zoom - 800 * zoom) + width / 2,
+      (int)(offsetY * zoom - (450 * 2 + 20) * zoom) + height / 2,
+      (int)(1600 * zoom),
+      (int)(450 * zoom)
+     );
+    
+    if(preview != null)
+      g.drawImage(preview,
+        (int)(offsetX * zoom - 800 * zoom) + width / 2,
+        (int)(offsetY * zoom - (450 * 2 + 20 - preview.getHeight() / 4) * zoom) + height / 2,
+        (int)(1600 * zoom),
+        (int)(preview.getHeight() * zoom),
+        null
+      );
   }
   
   public Point realToScreen(Point point) {
@@ -465,6 +497,10 @@ public class EditPane extends JPanel implements Runnable, MouseListener, KeyList
           undos.remove(undos.size()-1).undo();
       }
       break;
+    case KeyEvent.VK_R:
+      if(event.isControlDown()) {
+        reloadImages();
+      }
     case KeyEvent.VK_SPACE:
       Point point = getMousePosition();
       if(point != null) {

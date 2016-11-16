@@ -238,14 +238,14 @@ public class Main extends JFrame implements ActionListener{
     chooser.setDialogTitle("Select Smesh Folder");
     chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
     File smeshPath;
-    /*do {
+    do {
       chooser.cancelSelection();
       chooser.showOpenDialog(null);
       smeshPath = chooser.getSelectedFile();
       System.out.println("Path " + smeshPath.getAbsolutePath());
     } while(!new File(smeshPath.getAbsolutePath() + "\\app.py").exists());
-    */
-    smeshPath = new File("C:\\Users\\Isaac\\Desktop\\Smesh");
+    
+    //smeshPath = new File("C:\\Users\\Isaac\\Desktop\\Smesh");
     
     new Main(smeshPath);
   }

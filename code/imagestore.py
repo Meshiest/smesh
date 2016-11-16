@@ -96,6 +96,9 @@ torsos = [
   load("torso/torso_clannad_winter.png"),
   load("torso/torso_clannad_summer.png"),
   load("torso/torso_nichijou.png"),
+  load("torso/torso_haganai_yukino.png"),
+  load("torso/torso_sao_asuna.png"),
+  load("torso/torso_eva.png"),
 ]
 
 # Foot Images
@@ -118,4 +121,11 @@ def generateTorso():
   surface = pygame.Surface((100, 150), pygame.SRCALPHA, 32).convert_alpha()
   surface.blit(torso_base, surface.get_rect())
   surface.blit(torso, surface.get_rect())
+  return surface
+
+def generateFoot():
+  global feet
+  foot = sample(feet)
+  surface = pygame.Surface((34, 34), pygame.SRCALPHA, 32).convert_alpha()
+  surface.blit(foot, surface.get_rect())
   return surface

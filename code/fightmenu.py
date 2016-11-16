@@ -36,11 +36,11 @@ class FightMenu(GameMenu):
       if not self.players.get(id): continue
       self.players[id].render(screen)
 
-    for line in self.staticLines:
-      pygame.draw.line(screen, (255, 0, 0), line[0], line[1], 5)
+    #for line in self.staticLines:
+    #  pygame.draw.line(screen, (255, 0, 0), line[0], line[1], 5)
 
-    for line in self.platformLines:
-      pygame.draw.line(screen, (255, 255, 0), line[0], line[1], 5)
+    #for line in self.platformLines:
+    #  pygame.draw.line(screen, (255, 255, 0), line[0], line[1], 5)
 
 
 
