@@ -28,6 +28,7 @@ def sampleIndex(arr):
 head_base = load("head_base.png")
 arm_base = load("arm_base.png")
 leg_base = load("leg_base.png")
+torso_base = load("torso_base.png")
 
 # Face Images
 faces = [
@@ -85,10 +86,14 @@ faces = [
 
 # Torso Images
 torsos = [
-  load("torso/torso_base.png")
-  load("torso/torso_angelbeats.png")
-  load("torso/torso_angelbeats_tachibana.png")
-  load("torso/torso_shakunetsu.png")
+  load("torso/torso_angelbeats.png"),
+  load("torso/torso_angelbeats_tachibana.png"),
+  load("torso/torso_shakunetsu.png"),
+  load("torso/torso_sgdc_isaac.png"),
+  load("torso/torso_mirai_yuno.png"),
+  load("torso/torso_dress.png"),
+  load("torso/torso_underwear.png"),
+  load("torso/torso_clannad_winter.png"),
 ]
 
 def generateFace(index=-1):
@@ -104,5 +109,6 @@ def generateTorso():
   global torsos
   torso = sample(torsos)
   surface = pygame.Surface((100, 150), pygame.SRCALPHA, 32).convert_alpha()
+  surface.blit(torso_base, surface.get_rect())
   surface.blit(torso, surface.get_rect())
   return surface

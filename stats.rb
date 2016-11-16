@@ -3,6 +3,7 @@ numLines += Dir["**/*.js"].map{|n|open(n).read.count("\n")+1}.inject(&:+)
 numLines += Dir["**/*.css"].map{|n|open(n).read.count("\n")+1}.inject(&:+)
 numLines += Dir["**/*.html"].map{|n|open(n).read.count("\n")+1}.inject(&:+)
 numLines += Dir["**/*.json"].map{|n|open(n).read.count("\n")+1}.inject(&:+)
+numLines += Dir["**/*.java"].map{|n|open(n).read.count("\n")+1}.inject(&:+)
 
 numImages = Dir["**/*.png"].length
 
