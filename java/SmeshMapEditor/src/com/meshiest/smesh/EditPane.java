@@ -105,6 +105,17 @@ public class EditPane extends JPanel implements Runnable, MouseListener, KeyList
     dragType = 0;
     dragStart = null;
     lastDrag = null;
+    
+    previewFile = null;
+    preview = null;
+    iconFile = null;
+    icon = null;
+    foregroundFile = null;
+    foreground = null;
+    backgroundFile = null;
+    background = null;
+    middlegroundFile = null;
+    middleground = null;
   }
   
   public void generateTransparencyBG() {
@@ -312,7 +323,7 @@ public class EditPane extends JPanel implements Runnable, MouseListener, KeyList
     if(preview != null)
       g.drawImage(preview,
         (int)(offsetX * zoom - 800 * zoom) + width / 2,
-        (int)(offsetY * zoom - (450 * 2 + 20 - preview.getHeight() / 4) * zoom) + height / 2,
+        (int)(offsetY * zoom - (450 * 2 + 20) * zoom) + height / 2,
         (int)(1600 * zoom),
         (int)(preview.getHeight() * zoom),
         null

@@ -15,8 +15,7 @@ class MapMenu(GameMenu):
     self.maps = map(loadMap, [
       "demo",
       "demo2",
-      "demo2",
-      "demo",
+      "smash_mush",
     ])
 
     self.select_image = load("menu/map_select.png")

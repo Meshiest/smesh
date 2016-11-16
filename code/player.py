@@ -28,8 +28,10 @@ class Player():
     self.foot = generateFoot()
 
   def setLocation(self, theta, dist):
-    self.theta = theta
-    self.dist = dist
+    if theta != None:
+      self.theta = theta
+    if dist != None:
+      self.dist = dist
 
   def sendFace(self):
     self.conn.send(json.dumps({

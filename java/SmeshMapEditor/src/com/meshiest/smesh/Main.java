@@ -20,7 +20,7 @@ public class Main extends JFrame implements ActionListener{
   
   public File smeshPath;
   
-  public JMenuItem saveItem, openItem, setFG, setBG, setMG, reloadImages, setPreview, setIcon;
+  public JMenuItem saveItem, openItem, newItem, setFG, setBG, setMG, reloadImages, setPreview, setIcon, setName;
   public JButton showFG, showBG, showMG, showSpawns, showPlatforms, showStatics;
   
   public EditPane editPane;
@@ -47,10 +47,20 @@ public class Main extends JFrame implements ActionListener{
     openItem.addActionListener(this);
     fileMenu.add(openItem);
     
+    newItem = new JMenuItem("New");
+    newItem.setMnemonic('n');
+    newItem.addActionListener(this);
+    fileMenu.add(newItem);
+    
     menuBar.add(fileMenu);
     
     JMenu editMenu = new JMenu("Edit");
     editMenu.setMnemonic('e');
+    
+    setName = new JMenuItem("Set Name");
+    setName.addActionListener(this);
+    setName.setMnemonic('n');
+    editMenu.add(setName);
     
     setFG = new JMenuItem("Set Foreground");
     setFG.addActionListener(this);
@@ -113,6 +123,7 @@ public class Main extends JFrame implements ActionListener{
     
     JPanel contentPane = new JPanel(new BorderLayout());
     editPane = new EditPane(this);
+    setTitle("SmeshMapEditor - " + editPane.mapName);
     
     contentPane.add(editPane, BorderLayout.CENTER);
     contentPane.add(actionPane, BorderLayout.SOUTH);
@@ -180,17 +191,28 @@ public class Main extends JFrame implements ActionListener{
       editPane.icon = editPane.loadImageFromFile(editPane.iconFile);
     }
     
+    if (obj.equals(setName)) {
+      String name = JOptionPane.showInputDialog("Enter a Map Name");
+      editPane.mapName = name;
+      setTitle("SmeshMapEditor - " + editPane.mapName);
+    }
+    
     if (obj.equals(reloadImages)) {
       editPane.reloadImages();
     }
-    
-
     
     if(obj.equals(openItem)) {
       File loadFile = showSelector(false, false);
       if(loadFile != null) {
         editPane.loadJSON(loadFile);
       }
+      setTitle("SmeshMapEditor - " + editPane.mapName);
+    }
+    
+    if(obj.equals(newItem)) {
+      editPane.reset();
+      editPane.reloadImages();
+      setTitle("SmeshMapEditor - " + editPane.mapName);
     }
     
     if(obj.equals(saveItem)) {

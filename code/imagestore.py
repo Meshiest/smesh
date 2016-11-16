@@ -55,6 +55,7 @@ faces = [
   load("face/face_sgdc_katie.png"),
   load("face/face_sgdc_nick.png"),
   load("face/face_sgdc_noah.png"),
+  load("face/face_sgdc_alex.png"),
   load("face/face_nichijou_mio.png"),
   load("face/face_nichijou_yuuko.png"),
   load("face/face_nichijou_mai.png"),
@@ -103,6 +104,15 @@ torsos = [
   load("torso/torso_smash_peach.png"),
   load("torso/torso_miko.png"),
   load("torso/torso_akuma_toukaku.png"),
+  load("torso/torso_smash_zelda.png"),
+  load("torso/torso_pokemon_joy.png"),
+  load("torso/torso_katawa.png"),
+  load("torso/torso_gurren_yoko.png"),
+  load("torso/torso_black.png"),
+  load("torso/torso_snk_sasha.png"),
+  load("torso/torso_snk_mikasa.png"),
+  load("torso/torso_franken_fran.png"),
+  load("torso/torso_oreimo.png"),
 ]
 
 # Foot Images

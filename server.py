@@ -1,7 +1,7 @@
 from flask import Flask, request, send_from_directory, session, make_response
 from flask_socketio import SocketIO, emit, send
 from flask.ext.redis import FlaskRedis
-import socket, thread, json, sys, eventlet
+import socket, thread, json, sys, eventlet, random
 eventlet.monkey_patch(socket=True)
 
 sys.path.append('code')
@@ -13,18 +13,24 @@ server = Flask(__name__, static_folder='public', static_url_path='/public')
 server.secret_key = 'lol this is a secret key'
 redis_store = FlaskRedis(server)
 
-redis_store.set("userIds", 1)
+redis_store.set('seed', random.randint(0,100000))
+print("Set seed to " + str(redis_store.get("seed")))
+if(redis_store.get("userIds") == None):
+  redis_store.set("userIds", 1)
 
 # Root route to render index
 @server.route("/")
 def root():
   global server
-  print("Asking for root ")
-  if session.get("userId") == None:
+  print("Asking for root " + str(session.get("userId")))
+
+  seed = redis_store.get("seed")
+  if session.get("userId") == None or session.get('seed') != seed:
+    session['seed'] = seed
     userId = int(redis_store.get("userIds"))
     print(str(userId) + " id")
     session["userId"] = userId
-    redis_store.set("userIds", str(userId))
+    redis_store.set("userIds", str(userId + 1))
   return server.send_static_file('index.html')
 
 # Web Socket
@@ -60,11 +66,13 @@ def io_attack():
 def io_connect():
   print('Client connected')
   emit('nextLocation')
-  if session.get("userId") == None:
+  seed = redis_store.get("seed")
+  if session.get("userId") == None or session.get('seed') != seed:
+    session['seed'] = seed
     userId = int(redis_store.get("userIds"))
     print(str(userId) + " id")
     session["userId"] = userId
-    redis_store.set("userIds", str(userId))
+    redis_store.set("userIds", str(userId + 1))
 
   if session.get('face') != None:
     emit('face', {'face': session['face']})
