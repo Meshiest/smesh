@@ -4,3 +4,5 @@ java/.metadata/*
 java/.recommenders/*
 java/SmeshMapEditor/.settings/*
 java/SmeshMapEditor/bin/
+redis.log
+redis/data/dump.rdb

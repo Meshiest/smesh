@@ -1,5 +1,5 @@
 
-var socket = io.connect(null, {port: location.port, rememberTransport: false});
+var socket = io.connect("http://" + location.host);
 
 var socketTimeout;
 
@@ -17,11 +17,11 @@ socket.on('face', function(data) {
   console.log('got face', data)
   faceIndex = data.face;
   face = new Image();
-  face.src = "res/img/face/" + faces[faceIndex];
+  face.src = "public/res/img/face/" + faces[faceIndex];
 })
 
 var head_base = new Image();
-head_base.src = "res/img/head_base.png";
+head_base.src = "public/res/img/head_base.png";
 
 // faces used in pygame
 var faces = [

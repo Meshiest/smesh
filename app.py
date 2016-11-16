@@ -148,8 +148,9 @@ def ServerThread():
       if blob['type'] == 'connect' and players.get(blob['id']) and playersCanJoin:
         player = players[blob['id']]
         lobbyPlayer = player.lobbyPlayer
-        menus[0].queueRemove(lobbyPlayer.body)
-        menus[0].queueRemove(lobbyPlayer.poly)
+        if lobbyPlayer:      
+          menus[0].queueRemove(lobbyPlayer.body)
+          menus[0].queueRemove(lobbyPlayer.poly)
         del players[blob['id']]
 
       # Handle creating new players
@@ -164,7 +165,6 @@ def ServerThread():
       if not players[blob['id']]:
         continue
 
-      if blob['type'] == 'disconnect': # handle dropping players
         continue # jk lol no disconnections
         player = players[blob['id']]
         lobbyPlayer = player.lobbyPlayer
@@ -180,9 +180,9 @@ def ServerThread():
       if blob['type'] == 'attack':
         players[blob['id']].startAttack()
 
-    sockClient.send(json.dumps({
-      "action": "ping"
-    }) + "\n")
+    #sockClient.send(json.dumps({
+    #  "action": "ping"
+    #}) + "\n")
 
   sockClient.send(json.dumps({
     "action": "quit"

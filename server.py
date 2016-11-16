@@ -1,43 +1,48 @@
 from flask import Flask, request, send_from_directory, session, make_response
 from flask_socketio import SocketIO, emit, send
-import socket, thread, json, sys
+from flask.ext.redis import FlaskRedis
+import socket, thread, json, sys, eventlet
+eventlet.monkey_patch(socket=True)
 
 sys.path.append('code')
 
 from constants import *
 
 # Web Server
-server = Flask(__name__, static_url_path='', static_folder='public')
+server = Flask(__name__, static_folder='public', static_url_path='/public')
 server.secret_key = 'lol this is a secret key'
-userIds = 0
+redis_store = FlaskRedis(server)
+
+redis_store.set("userIds", 0)
+print("ids at " + redis_store.get("userIds"))
+redis_store.set("userIds", int(redis_store.get("userIds")) + 1)
+print("ids at " + redis_store.get("userIds"))
 
 # Root route to render index
 @server.route("/")
 def root():
-  global server, userIds
-  print("Asking for root")
-  if not session.get("userId"):
-    session["userId"] = userIds
-    userIds += 1
+  global server
+  print("Asking for root ")
+  if session.get("userId") == None:
+    userId = int(redis_store.get("userIds"))
+    print(str(userId) + " id")
+    session["userId"] = userId
+    redis_store.set("userIds", str(userId))
   return server.send_static_file('index.html')
 
 # Web Socket
-socketio = SocketIO(server)
-sendQueue = {}
-
+#socketio = SocketIO(server)
+# eventlet does not pass a flask instance
+socketio = SocketIO(server, message_queue='redis://localhost:6379')
 @socketio.on('location')
 def io_location(blob):
   emit('nextLocation')
 
   # Check if the server needs to send anything to this user
-  if sendQueue.get(session["userId"]):
-    messages = sendQueue[session["userId"]]
-    for message in messages:
-      if message['action'] == 'face':
-        session['face'] = message['data']['face']
-
-      emit(message['action'], message['data'])
-    del sendQueue[session["userId"]]
+  face = redis_store.get("face_" + str(session["userId"]))
+  if session.get('face') == None and face:
+    session["face"] = int(face)
+    emit('face', {'face': session['face']})
 
   # Tell game the user's location
   sendMsg({
@@ -57,11 +62,10 @@ def io_attack():
 
 @socketio.on('connect')
 def io_connect():
-  global userIds
   print('Client connected')
   emit('nextLocation')
 
-  if session.get('face'):
+  if session.get('face') != None:
     emit('face', {'face': session['face']})
 
   # Tell game we have a new user
@@ -72,7 +76,6 @@ def io_connect():
 
 @socketio.on('disconnect')
 def io_disconnect():
-  global userIds
   print('Client disconnected')
 
   # Tell game we have lost a user
@@ -100,19 +103,14 @@ def parseData(data):
   for blob in blobs:
     blob = json.loads(blob)
 
-    if not blob.get('id'):
+    if blob.get('id') == None:
       # Quit if the pygame client sends the quit command
       if blob.get('action') == 'quit':
         sys.exit()
-
       continue
 
-    # Create a new sendQueue entry if we don't have a queued message yet
-    if not sendQueue.get(blob['id']):
-      sendQueue[blob['id']] = []
-
-    # Add the message to the queue
-    sendQueue[blob['id']].append(blob['blob'])
+    if blob['blob']['action'] == 'face':
+      redis_store.set('face_' + str(blob['id']), blob['blob']['data']['face'])
 
   return items[-1]
 
@@ -131,6 +129,7 @@ def ServerThread():
       if not req: # Terminating connections on empty string
         break 
       req = str.decode(req)
+      print("Got " + req)
 
       data += req
       data = parseData(data)

@@ -100,6 +100,9 @@ torsos = [
   load("torso/torso_sao_asuna.png"),
   load("torso/torso_eva.png"),
   load("torso/torso_smash_rosalina.png"),
+  load("torso/torso_smash_peach.png"),
+  load("torso/torso_miko.png"),
+  load("torso/torso_akuma_toukaku.png"),
 ]
 
 # Foot Images
