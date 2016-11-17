@@ -1,4 +1,4 @@
-import pygame, thread, time, sys, math, copy, socket, json
+import pygame, thread, time, sys, math, copy, socket, json, redis
 sys.path.append('code')
 from constants import *
 
@@ -34,6 +34,8 @@ WIN_MENU = 3
 currMenu = LOBBY_MENU
 sockClient = None
 musicState = 0
+
+r = redis.StrictRedis(host='localhost', port=6379, db=0)
 
 def toMapMenu():
   global currMenu, playersCanJoin
@@ -74,6 +76,15 @@ def onKeyPress(key):
   if currMenu == LOBBY_MENU:
     if key == pygame.K_SPACE and len(players) > 0:
       toMapMenu()
+    if key == pygame.K_z:
+      keys = players.keys()
+      for id in keys:
+        player = players[id]
+        lobbyPlayer = player.lobbyPlayer
+        if lobbyPlayer and time.time() - player.lastMove > 2:
+          menus[LOBBY_MENU].queueRemove(lobbyPlayer.body)
+          menus[LOBBY_MENU].queueRemove(lobbyPlayer.poly)
+          del players[id]
 
   elif currMenu == MAP_MENU:
     if key == pygame.K_ESCAPE:
@@ -182,18 +193,19 @@ def ServerThread():
         player = players[blob['id']]
         lobbyPlayer = player.lobbyPlayer
         if lobbyPlayer:      
-          menus[0].queueRemove(lobbyPlayer.body)
-          menus[0].queueRemove(lobbyPlayer.poly)
+          menus[LOBBY_MENU].queueRemove(lobbyPlayer.body)
+          menus[LOBBY_MENU].queueRemove(lobbyPlayer.poly)
         del players[blob['id']]
 
       # Handle creating new players
       if (blob['type'] == 'connect' or players.get(blob['id']) == None) and playersCanJoin: # handle new players
         players[blob['id']] = Player(blob['id'], sockClient)
-        players[blob['id']].sendFace()
+        r.set('face_' + str(blob['id']), players[blob['id']].faceid)
+        #players[blob['id']].sendFace()
 
       # Send the player's face if they already were connected
-      if blob['type'] == 'connect' and players.get(blob['id']) and not playersCanJoin:
-        players[blob['id']].sendFace()
+      #if blob['type'] == 'connect' and players.get(blob['id']) and not playersCanJoin:
+        #players[blob['id']].sendFace()
 
       if players.get(blob['id']) == None:
         continue
@@ -202,8 +214,8 @@ def ServerThread():
         player = players[blob['id']]
         lobbyPlayer = player.lobbyPlayer
         if lobbyPlayer:
-          menus[0].queueRemove(lobbyPlayer.body)
-          menus[0].queueRemove(lobbyPlayer.poly)
+          menus[LOBBY_MENU].queueRemove(lobbyPlayer.body)
+          menus[LOBBY_MENU].queueRemove(lobbyPlayer.poly)
 
         del players[blob['id']]
 

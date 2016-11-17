@@ -11,6 +11,10 @@ function postLocation() {
   socketTimeout = setTimeout(postLocation, 500);
 }
 
+// tell the game we're not a bot
+socket.on('connect', function(){
+  socket.emit('game_connect')
+})
 socket.on('nextLocation', postLocation);
 
 socket.on('face', function(data) {

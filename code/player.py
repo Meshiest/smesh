@@ -19,6 +19,7 @@ class Player():
   radius = 30
   footTheta = 0
   dead = False
+  lastMove = 0
 
   def __init__(self, id, conn):
     self.conn = conn
@@ -28,24 +29,14 @@ class Player():
     self.torso = generateTorso()
     self.foot = generateFoot()
     self.weapon = generateWeapon()
+    self.lastMove = 0
 
   def setLocation(self, theta, dist):
     if theta != None:
       self.theta = theta
+      self.lastMove = time.time()
     if dist != None:
       self.dist = dist
-
-  def sendFace(self):
-    self.conn.send(json.dumps({
-      'id': self.id,
-      'blob': {
-        'action': 'face',
-        'data': {
-          'face': self.faceid
-        }
-      }
-    }) + "\n")
-    print('sent face' + str(self.faceid))
 
   # Called when a player taps the screen
   def startAttack(self):
