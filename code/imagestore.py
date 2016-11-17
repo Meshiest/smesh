@@ -138,6 +138,7 @@ weapons = [
   {'img': load('weapons/weapon_umbrella.png'), 'hand': (50, 170)},
   {'img': load('weapons/weapon_guardian.png'), 'hand': (50, 160)},
   {'img': load('weapons/weapon_echo.png'), 'hand': (40, 170)},
+  {'img': load('weapons/weapon_pan.png'), 'hand': (50, 180)},
 ]
 
 # Foot Images

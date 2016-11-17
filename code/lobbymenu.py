@@ -3,6 +3,7 @@ from constants import *
 from gamemenu import *
 from player import *
 from font import *
+from imagestore import *
 
 class LobbyMenu(GameMenu):
 
@@ -47,6 +48,8 @@ class LobbyMenu(GameMenu):
 
     # Pre-render text that is displayed
     self.nextScreenText = fontBold80.render("Press Space When Ready!", 1, (160, 160, 250))
+
+    self.backgroundImage = load("menu/lobby_background.png")
   
   def queueRemove(self, obj):
     self.removeQueue.append(obj)
@@ -71,8 +74,9 @@ class LobbyMenu(GameMenu):
     minDim = min(WIDTH, HEIGHT)/2
 
     # Draw circle in background
-    pygame.draw.circle(screen, (255, 255, 255), (WIDTH/2, HEIGHT/2), minDim)
-    pygame.draw.rect(screen, (255, 255, 255), (WIDTH/2-minDim/2, 0, minDim, HEIGHT/2), minDim)
+    #pygame.draw.circle(screen, (255, 255, 255), (WIDTH/2, HEIGHT/2), minDim)
+    #pygame.draw.rect(screen, (255, 255, 255), (WIDTH/2-minDim/2, 0, minDim, HEIGHT/2), minDim)
+    screen.blit(self.backgroundImage, (0, 0, WIDTH, HEIGHT))
 
     keys = self.players.keys()
     for id in keys:
@@ -83,7 +87,7 @@ class LobbyMenu(GameMenu):
       except Exception:
         pass
 
-    screen.blit(self.nextScreenText, (WIDTH/2 - self.nextScreenText.get_width()/2, 40))
+    #screen.blit(self.nextScreenText, (WIDTH/2 - self.nextScreenText.get_width()/2, 40))
 
   def keyDown(self, key):
     pass
