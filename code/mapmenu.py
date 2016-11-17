@@ -1,8 +1,9 @@
-import pygame, math, json
+import pygame, math, json, glob
 from constants import *
 from gamemenu  import *
 from font import *
 from imagestore import *
+
 
 def loadMap(name):
   return MapPreview(name)
@@ -12,13 +13,10 @@ class MapMenu(GameMenu):
   def __init__(self, players):
     GameMenu.__init__(self, players)
     self.selectedMap = 0
-    self.maps = map(loadMap, [
-      "demo",
-      "demo2",
-      "smash_mush",
-    ])
+    self.maps = map(loadMap, glob.glob("public/res/map/*.json"))
 
     self.select_image = load("menu/map_select.png")
+    self.map_shelf_image = load("menu/map_shelf.png")
     self.translateOffset = 0
 
   def tick(self, deltaTime):
@@ -55,6 +53,11 @@ class MapMenu(GameMenu):
       (WIDTH/2 - font.get_width()/2 - self.translateOffset * 50, 5)
     )
 
+    screen.blit(self.map_shelf_image, (
+      0, HEIGHT/2,
+      WIDTH, HEIGHT/2
+    ))    
+
     # Render icons for the maps, 2 to the left, 2 to the right
     numMaps = len(self.maps)
     for i in range(5):
@@ -72,6 +75,7 @@ class MapMenu(GameMenu):
       WIDTH/2 - self.select_image.get_width() / 2,
       HEIGHT*3/4 - self.select_image.get_height() / 2
     ))
+
 
 
   def keyDown(self, key):
@@ -92,7 +96,7 @@ class MapPreview:
   def __init__(self, filename):
     blob = ""
     # Open file in map directory
-    with open("./public/res/map/" + filename + ".json") as f:
+    with open(filename) as f:
       content = f.read()
       blob = json.loads(content)
       self.blob = blob

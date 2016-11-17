@@ -1,6 +1,6 @@
 from flask import Flask, request, send_from_directory, session, make_response
 from flask_socketio import SocketIO, emit, send
-from flask.ext.redis import FlaskRedis
+from flask_redis import FlaskRedis
 import socket, thread, json, sys, eventlet, random
 eventlet.monkey_patch(socket=True)
 
@@ -84,7 +84,7 @@ def io_connect():
 
 @socketio.on('disconnect')
 def io_disconnect():
-  print('Client disconnected')
+  print('Client disconnected ' + str(session.get("userId")))
 
   # Tell game we have lost a user
   sendMsg({

@@ -1,0 +1,63 @@
+{
+  "preview": "finalDpreview.png",
+  "segments_static": [
+    [
+      [
+        277,
+        535
+      ],
+      [
+        1310,
+        536
+      ]
+    ],
+    [
+      [
+        1310,
+        536
+      ],
+      [
+        925,
+        907
+      ]
+    ],
+    [
+      [
+        278,
+        537
+      ],
+      [
+        672,
+        911
+      ]
+    ]
+  ],
+  "middleground": "",
+  "background": "final_destination.png",
+  "name": "Final Destination",
+  "icon": "final_destination_icon.png",
+  "foreground": "",
+  "segments_platform": [],
+  "spawnpoints": [
+    [
+      795,
+      467
+    ],
+    [
+      444,
+      466
+    ],
+    [
+      614,
+      465
+    ],
+    [
+      972,
+      468
+    ],
+    [
+      1141,
+      465
+    ]
+  ]
+}

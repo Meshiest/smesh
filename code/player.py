@@ -11,13 +11,14 @@ class Player():
   dist = 0
   smoothDist = 0
   attacking = False
-  hasAttacked = False
   lastAttack = 0
   jumping = False
   lobbyPlayer = None
   direction = False
+  grounded = False
   radius = 30
   footTheta = 0
+  dead = False
 
   def __init__(self, id, conn):
     self.conn = conn
@@ -54,7 +55,6 @@ class Player():
     else:
       self.lastAttack = time.time()
       self.attacking = True
-      self.hasAttacked = False
 
   def tryJumping(self):
     self.jumping = True
@@ -68,6 +68,7 @@ class Player():
     self.poly.collision_type = 1
     self.body.damping = 0.8
     self.space.add(self.body, self.poly)
+    self.dead = False
 
   # Used to detect collisions between player and ground
   def raycastCallback(self, ray):
@@ -83,6 +84,12 @@ class Player():
 
 
   def tick(self, deltaTime):
+    if self.body.position.y < -200:
+      self.dead = True
+      self.space.remove(self.body)
+      self.space.remove(self.poly)
+      return
+
     self.raycast_normal = Vec2d.zero()
     self.raycast_penetration = Vec2d.zero()
     self.raycast_impulse = Vec2d.zero()
@@ -102,7 +109,7 @@ class Player():
     self.body.each_arbiter(lambda ray: self.raycastCallback(ray))
 
     grounded = self.raycast_body != None and abs(self.raycast_normal.x / self.raycast_normal.y) < -PLAYER_GROUND_ACCEL/self.space.gravity.y
-
+    self.grounded = grounded
     if grounded:
       self.footTheta += self.body.velocity.x * 0.1 * deltaTime + math.pi * 2
     elif self.jumping:
@@ -150,25 +157,16 @@ class Player():
     neckLength = 20
     armLength = 50
 
-    faceRight = abs(self.body.velocity.x) > 10 and self.body.velocity.x > 0
+    faceRight = abs(math.cos(self.theta) * self.dist) > 0.05 and math.cos(self.theta) * self.dist > 0
     rightMult = faceRight and -1 or 1
-
-    # Draw Torso
-    torsoWidth = self.torso.get_width()
-    torsoHeight = self.torso.get_height()
-    screen.blit(
-      pygame.transform.flip(self.torso, faceRight, False),
-      (
-        x - torsoWidth / 2,
-        y - torsoHeight - legHeight,
-        torsoWidth,
-        torsoHeight
-      )
-    )
 
     # Draw Feet
     footWidth = self.foot.get_width()
     footHeight = self.foot.get_height()
+    
+    torsoWidth = self.torso.get_width()
+    torsoHeight = self.torso.get_height()
+
     leftFoot = pygame.transform.flip(self.foot, faceRight, False)
     screen.blit(
       leftFoot,
@@ -189,6 +187,16 @@ class Player():
       )
     )
 
+    # Draw Torso
+    screen.blit(
+      pygame.transform.flip(self.torso, faceRight, False),
+      (
+        x - torsoWidth / 2,
+        y - torsoHeight - legHeight,
+        torsoWidth,
+        torsoHeight
+      )
+    )
 
     # Draw Face
     theta = self.smoothTheta
@@ -235,10 +243,9 @@ class Player():
 
     handTheta = (math.cos((now + self.id)  % (math.pi * 2))  + 1) * 0.2 - 1.2
     screen.blit(
-        pygame.transform.rotate(
-          hand_base,
+        pygame.transform.flip(pygame.transform.rotate(hand_base,
           handTheta / math.pi * 180
-        ), (
+        ), faceRight, False), (
         x - (-torsoWidth / 3 - math.cos(-handTheta) * armLength) * rightMult - hand_base.get_width()/2,
         y - torsoHeight + 40 + math.sin(-handTheta) * armLength - hand_base.get_height()/2,
         weaponWidth, 

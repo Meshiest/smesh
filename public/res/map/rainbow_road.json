@@ -1,0 +1,49 @@
+{
+  "preview": "rainbow_preview.png",
+  "segments_static": [[
+    [
+      127,
+      683
+    ],
+    [
+      1420,
+      686
+    ]
+  ]],
+  "middleground": "",
+  "background": "rainbow_bg.png",
+  "name": "Rainbow Road",
+  "icon": "rainbow_icon.png",
+  "foreground": "",
+  "segments_platform": [],
+  "spawnpoints": [
+    [
+      288,
+      580
+    ],
+    [
+      462,
+      571
+    ],
+    [
+      602,
+      569
+    ],
+    [
+      772,
+      566
+    ],
+    [
+      914,
+      563
+    ],
+    [
+      1057,
+      556
+    ],
+    [
+      1239,
+      560
+    ]
+  ]
+}

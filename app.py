@@ -2,8 +2,10 @@ import pygame, thread, time, sys, math, copy, socket, json
 sys.path.append('code')
 from constants import *
 
+pygame.mixer.pre_init(frequency=44100, size=-16, channels=2, buffer=4096)
 pygame.init()
-pygame.mixer.init(frequency=22100, size=-16, channels=2, buffer=2048)
+print(pygame.mixer.get_init())
+
 real_screen = pygame.display.set_mode([REAL_WIDTH, REAL_HEIGHT], pygame.HWSURFACE|pygame.DOUBLEBUF)
 screen = pygame.Surface((WIDTH, HEIGHT))
 
@@ -12,6 +14,8 @@ from font import *
 from lobbymenu import *
 from mapmenu import *
 from fightmenu import *
+from winmenu import *
+from audio import *
 
 # Pygame
 players = {}
@@ -19,14 +23,17 @@ menus = [
   LobbyMenu(players),
   MapMenu(players),
   FightMenu(players),
+  WinMenu(players),
 ]
 # Constants for determining which menu to use
 LOBBY_MENU = 0
 MAP_MENU = 1
 FIGHT_MENU = 2
+WIN_MENU = 3
 
 currMenu = LOBBY_MENU
 sockClient = None
+musicState = 0
 
 def toMapMenu():
   global currMenu, playersCanJoin
@@ -34,9 +41,14 @@ def toMapMenu():
   playersCanJoin = False
 
 def toLobbyMenu():
-  global currMenu, playersCanJoin
+  global currMenu, playersCanJoin, musicState
   currMenu = LOBBY_MENU
   playersCanJoin = True
+  musicState = 0
+  print("playing lobby " + str(lobby_start))
+  lobby_start.play()
+
+toLobbyMenu()
 
 def toFightMenu():
   global currMenu
@@ -45,6 +57,11 @@ def toFightMenu():
   menus[FIGHT_MENU].loadMap(blob)
   currMenu = FIGHT_MENU
   menus[FIGHT_MENU].start()
+
+def toWinMenu():
+  global currMenu
+  menus[WIN_MENU].setWinner(menus[FIGHT_MENU].winner)
+  currMenu = WIN_MENU
 
 currTime = time.time()
 gameRunning = True
@@ -68,6 +85,10 @@ def onKeyPress(key):
     if key == pygame.K_ESCAPE:
       toLobbyMenu()
 
+  elif currMenu == WIN_MENU:
+    if key == pygame.K_SPACE:
+      toMapMenu()
+
 # When a key is released
 def onKeyRelease(key):
   global currMenu, menus
@@ -79,6 +100,9 @@ def render():
   pygame.draw.rect(screen, (0, 0, 0), (0, 0, WIDTH, HEIGHT))
 
   menus[currMenu].tick(deltaTime)
+  if currMenu == FIGHT_MENU and menus[currMenu].winner != None:
+    toWinMenu()
+
   menus[currMenu].render(screen)
   pygame.transform.scale(screen, 
     (REAL_WIDTH, REAL_HEIGHT),
@@ -87,7 +111,7 @@ def render():
 
 
 def gameLoop():
-  global currTime, deltaTime, gameRunning, screen, WIDTH, HEIGHT
+  global currTime, deltaTime, gameRunning, screen, WIDTH, HEIGHT, currMenu, END_MUSIC_EVENT
 
   # Get current unix time
   lastTime, currTime = currTime, time.time()
@@ -112,6 +136,15 @@ def gameLoop():
     # When keys are released
     if event.type == pygame.KEYUP:
       onKeyRelease(event.dict['key'])
+
+    if event.type == END_MUSIC_EVENT:
+      print("Music Over")
+      if currMenu == LOBBY_MENU:
+        print("Playing Loop")
+        musicState = 1
+        lobby_loop.play()
+
+
 
   render()
   pygame.display.update()
@@ -145,7 +178,7 @@ def ServerThread():
       blob = json.loads(str.decode(msg))
 
       # player reconnected without properly disconnecting
-      if blob['type'] == 'connect' and players.get(blob['id']) and playersCanJoin:
+      if blob['type'] == 'connect' and players.get(blob['id']) != None and playersCanJoin:
         player = players[blob['id']]
         lobbyPlayer = player.lobbyPlayer
         if lobbyPlayer:      
@@ -154,7 +187,7 @@ def ServerThread():
         del players[blob['id']]
 
       # Handle creating new players
-      if (blob['type'] == 'connect' or not players.get(blob['id'])) and playersCanJoin: # handle new players
+      if (blob['type'] == 'connect' or players.get(blob['id']) == None) and playersCanJoin: # handle new players
         players[blob['id']] = Player(blob['id'], sockClient)
         players[blob['id']].sendFace()
 
@@ -162,10 +195,10 @@ def ServerThread():
       if blob['type'] == 'connect' and players.get(blob['id']) and not playersCanJoin:
         players[blob['id']].sendFace()
 
-      if not players[blob['id']]:
+      if players.get(blob['id']) == None:
         continue
 
-        continue # jk lol no disconnections
+      if blob['type'] == 'disconnect' and playersCanJoin:
         player = players[blob['id']]
         lobbyPlayer = player.lobbyPlayer
         if lobbyPlayer:

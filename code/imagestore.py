@@ -116,6 +116,7 @@ torsos = [
   load("torso/torso_oreimo.png"),
   load("torso/torso_spice_holo.png"),
   load("torso/torso_miko_mido.png"),
+  load("torso/torso_chunli.png"),
 ]
 
 # Weapon Images and Meta
@@ -135,11 +136,24 @@ weapons = [
   {'img': load('weapons/weapon_scimitar.png'), 'hand': (50, 160)},
   {'img': load('weapons/weapon_scythe.png'), 'hand': (50, 170)},
   {'img': load('weapons/weapon_umbrella.png'), 'hand': (50, 170)},
+  {'img': load('weapons/weapon_guardian.png'), 'hand': (50, 160)},
+  {'img': load('weapons/weapon_echo.png'), 'hand': (40, 170)},
 ]
 
 # Foot Images
 feet = [
   load("foot/foot_bare.png"),
+  load("foot/foot_boot.png"),
+  load("foot/foot_sock_sandal.png"),
+  load("foot/foot_waterbottle.png"),
+  load("foot/foot_sandal.png"),
+  load("foot/foot_bunnyslipper.png"),
+  load("foot/foot_cowboy.png"),
+  load("foot/foot_snakeboot.png"),
+  load("foot/foot_dick_1.png"),
+  load("foot/foot_dick_2.png"),
+  load("foot/foot_gordon.png"),
+  load("foot/foot_sock.png"),
 ]
 
 def generateFace(index=-1):

@@ -7,18 +7,47 @@ from font import *
 from imagestore import *
 
 class FightMenu(GameMenu):
-  players = []
-
+  players = []  
   def __init__(self, players):
     GameMenu.__init__(self, players)
     self.hasInit = False
 
   def tick(self, deltaTime):
+    now = time.time()
     # Tick all the players
     keys = self.players.keys()
+    numLivingPlayers = 0
+    livingPlayer = None
     for id in keys:
       if not self.players.get(id): continue
-      self.players[id].tick(deltaTime)
+      player = self.players[id]
+      if player.dead: continue
+      numLivingPlayers += 1
+      livingPlayer = player
+      player.tick(deltaTime)
+      if now - player.lastAttack < 0.5 and player.attacking:
+        player.attacking = False
+        # direction player is facing
+        direction = math.cos(player.theta) * player.dist > 0.1 and 1 or -1
+        for otherId in keys:
+          if id == otherId: continue
+          other = self.players[otherId]
+          
+          if other.dead: continue
+
+          distance = math.hypot(player.body.position.x - other.body.position.x, player.body.position.y - other.body.position.y)
+          # Direction from player to target
+          otherDir = other.body.position.x - player.body.position.x > 0 and 1 or -1
+          if otherDir == direction and distance < 60:
+            groundMult = player.grounded and 3 or 1
+            other.body.apply_impulse_at_local_point((
+              direction * 400 * groundMult,
+              200
+            ))
+            break
+
+    if numLivingPlayers == 1 and len(self.players) != 1:
+      self.winner = livingPlayer.id
 
     # Step the physics space
     self.space.step(deltaTime)
@@ -34,6 +63,7 @@ class FightMenu(GameMenu):
     keys = self.players.keys()
     for id in keys:
       if not self.players.get(id): continue
+      if self.players[id].dead: continue
       self.players[id].render(screen)
 
     #for line in self.staticLines:
@@ -41,7 +71,6 @@ class FightMenu(GameMenu):
 
     #for line in self.platformLines:
     #  pygame.draw.line(screen, (255, 255, 0), line[0], line[1], 5)
-
 
 
     # Render the foreground
@@ -77,6 +106,9 @@ class FightMenu(GameMenu):
     # Don't let the fight menu init itself twice on the same map
     if self.hasInit:
       return
+
+    # Remove Current Winner
+    self.winner = None
 
     # Create a physics space for the map
     self.space = pymunk.Space() 

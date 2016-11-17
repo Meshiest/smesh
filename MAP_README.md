@@ -1,7 +1,14 @@
+Info:
+
+* Background/Middleground/Foreground size: 1600x900
+* Preview size: 1600x450
+* Icon size: 200x200
+
 Map Editor Menus:
 
 * Add foreground/middleground/background under Edit -> Set [THING] -> Pick image
 * Remove foreground/middleground/background under Edit -> Set [THING] -> Cancel
+* Set map name under Edit -> Set Name
 
 Map Editor Keywords:
   
@@ -21,3 +28,7 @@ Map Editor Keybinds:
 * Middle Click + Drag - Move view
 * Scroll - Zoom View
 * CTRL z - Undo
+
+Editor Action Bar:
+
+* Use the buttons on the action bar to toggle different layers
