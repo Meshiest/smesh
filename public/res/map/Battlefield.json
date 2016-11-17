@@ -1,0 +1,84 @@
+{
+  "preview": "BattlefieldPreview.png",
+  "segments_static": [[
+    [
+      376,
+      607
+    ],
+    [
+      1189,
+      606
+    ]
+  ]],
+  "middleground": "",
+  "background": "Battlefield.png",
+  "name": "Battlefield",
+  "icon": "BattlefieldIcon.png",
+  "foreground": "",
+  "segments_platform": [
+    [
+      [
+        473,
+        475
+      ],
+      [
+        653,
+        475
+      ]
+    ],
+    [
+      [
+        915,
+        475
+      ],
+      [
+        1088,
+        475
+      ]
+    ],
+    [
+      [
+        690,
+        354
+      ],
+      [
+        875,
+        354
+      ]
+    ]
+  ],
+  "spawnpoints": [
+    [
+      556,
+      529
+    ],
+    [
+      656,
+      529
+    ],
+    [
+      766,
+      528
+    ],
+    [
+      867,
+      529
+    ],
+    [
+      986,
+      528
+    ],
+    [
+      1002,
+      424
+    ],
+    [
+      560,
+      426
+    ],
+    [
+      780,
+      292
+    ]
+  ]
+}
