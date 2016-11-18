@@ -96,7 +96,6 @@ class MapPreview:
       blob = json.loads(content)
       import os
       blob['filename'] = os.path.basename(os.path.splitext(filename)[0])
-      print(blob['filename'])
       self.blob = blob
 
     # Only load in the preview and icon data
