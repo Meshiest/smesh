@@ -19,14 +19,6 @@ public class Segment {
     g.drawLine(a.x, a.y, b.x, b.y);
   }
   
-  public String toString() {
-    return "[\n" +
-           "  [" + a.x + ", " + a.y + "],\n" +
-           "  [" + b.x + ", " + b.y + "]\n" +
-           "]";
-     
-  }
-  
   public static ArrayList<Segment> fromJSONArray(JSONArray arr) {
     ArrayList<Segment> segs = new ArrayList<>();
     for(int i = 0; i < arr.length(); i++) {

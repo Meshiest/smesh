@@ -240,7 +240,7 @@ public class Main extends JFrame implements ActionListener{
   private File showSelector(boolean isImage, boolean saving) {
     
     File path = new File(smeshPath.getAbsolutePath() + 
-        (isImage ? "\\public\\res\\img\\map" : "\\public\\res\\map"));
+        (isImage ? "/public/res/img/map" : "/public/res/map"));
     JFileChooser chooser = new JFileChooser(path);
     chooser.setDialogTitle(isImage ? "Select Image" : "Select Map File");
     chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -265,7 +265,7 @@ public class Main extends JFrame implements ActionListener{
       chooser.showOpenDialog(null);
       smeshPath = chooser.getSelectedFile();
       System.out.println("Path " + smeshPath.getAbsolutePath());
-    } while(!new File(smeshPath.getAbsolutePath() + "\\app.py").exists());
+    } while(!new File(smeshPath.getAbsolutePath() + "/app.py").exists());
     
     //smeshPath = new File("C:\\Users\\Isaac\\Desktop\\Smesh");
     
