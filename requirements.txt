@@ -1,5 +1,6 @@
 Flask
 flask_socketio
+flask_redis
 pygame
 Pymunk
 eventlet
