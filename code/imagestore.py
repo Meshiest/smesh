@@ -127,6 +127,7 @@ weapons = [
   {'img': load('weapons/weapon_cleaver.png'), 'hand': (50, 180)},
   {'img': load('weapons/weapon_dagger.png'), 'hand': (50, 190)},
   {'img': load('weapons/weapon_doggy.png'), 'hand': (50, 190)},
+  {'img': load('weapons/weapon_doggy2.png'), 'hand': (50, 190)},
   {'img': load('weapons/weapon_lamp.png'), 'hand': (50, 170)},
   {'img': load('weapons/weapon_lovestaff.png'), 'hand': (50, 170)},
   {'img': load('weapons/weapon_maraca.png'), 'hand': (50, 170)},
@@ -142,6 +143,16 @@ weapons = [
   {'img': load('weapons/weapon_bread.png'), 'hand': (50, 180)},
   {'img': load('weapons/weapon_skullstaff.png'), 'hand': (50, 140)},
   {'img': load('weapons/weapon_horse.png'), 'hand': (50, 180)},
+  {'img': load('weapons/weapon_paddle.png'), 'hand': (45, 180)},
+  {'img': load('weapons/weapon_rose.png'), 'hand': (50, 180)},
+  {'img': load('weapons/weapon_snk.png'), 'hand': (25, 146)},
+  {'img': load('weapons/weapon_stick.png'), 'hand': (42, 170)},
+  {'img': load('weapons/weapon_swordred.png'), 'hand': (42, 175)},
+  {'img': load('weapons/weapon_emeraldstaff.png'), 'hand': (20, 170)},
+  {'img': load('weapons/weapon_swordpink.png'), 'hand': (23, 160)},
+  {'img': load('weapons/weapon_swordorb.png'), 'hand': (21, 165)},
+  {'img': load('weapons/weapon_swordsanic.png'), 'hand': (26, 173)},
+  {'img': load('weapons/weapon_scalpel.png'), 'hand': (15, 152)},
 ]
 
 # Foot Images
@@ -158,6 +169,10 @@ feet = [
   load("foot/foot_dick_2.png"),
   load("foot/foot_gordon.png"),
   load("foot/foot_sock.png"),
+  load("foot/foot_loafer.png"),
+  load("foot/foot_shark.png"),
+  load("foot/foot_sneakerboot.png"),
+  load("foot/foot_heel.png"),
 ]
 
 def generateFace(index=-1):
