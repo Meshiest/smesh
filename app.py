@@ -53,7 +53,6 @@ def toLobbyMenu():
   currMenu = LOBBY_MENU
   playersCanJoin = True
   musicState = 0
-  print("playing lobby " + str(lobby_start))
   pygame.mixer.music.load(lobby_start)
   pygame.mixer.music.play()
   pygame.mixer.music.queue(lobby_loop)

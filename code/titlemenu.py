@@ -47,6 +47,15 @@ class TitleMenu(GameMenu):
         int(head['face'].get_width() * scale),
         int(head['face'].get_height() * scale)
       ))
+      imgWidth = img.get_width()
+      imgHeight = img.get_height()
+      
+      pygame.draw.ellipse(screen, (0, 100, 0), (
+        head['pos'][0] - imgWidth / 2 * 0.8,
+        head['pos'][1] * HEIGHT / 2 + HEIGHT/10 + height + imgHeight / 2 - imgHeight * 0.2,
+        imgWidth * 0.8,
+        imgHeight * 0.2
+      ))
       img = pygame.transform.rotate(img, -(((time.time() + i) * freq) % 360))
       screen.blit(
         img, (
