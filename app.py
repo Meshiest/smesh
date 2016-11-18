@@ -15,6 +15,7 @@ from lobbymenu import *
 from mapmenu import *
 from fightmenu import *
 from winmenu import *
+from titlemenu import *
 from audio import *
 
 # Pygame
@@ -24,16 +25,19 @@ menus = [
   MapMenu(players),
   FightMenu(players),
   WinMenu(players),
+  TitleMenu(players),
 ]
 # Constants for determining which menu to use
 LOBBY_MENU = 0
 MAP_MENU = 1
 FIGHT_MENU = 2
 WIN_MENU = 3
+TITLE_MENU = 4
 
-currMenu = LOBBY_MENU
+currMenu = TITLE_MENU
 sockClient = None
 musicState = 0
+playersCanJoin = False
 
 r = redis.StrictRedis(host='localhost', port=6379, db=0)
 
@@ -41,6 +45,8 @@ def toMapMenu():
   global currMenu, playersCanJoin
   currMenu = MAP_MENU
   playersCanJoin = False
+  pygame.mixer.music.load(elevator_loop)
+  pygame.mixer.music.play(1000)
 
 def toLobbyMenu():
   global currMenu, playersCanJoin, musicState
@@ -48,9 +54,19 @@ def toLobbyMenu():
   playersCanJoin = True
   musicState = 0
   print("playing lobby " + str(lobby_start))
-  lobby_start.play()
+  pygame.mixer.music.load(lobby_start)
+  pygame.mixer.music.play()
+  pygame.mixer.music.queue(lobby_loop)
 
-toLobbyMenu()
+def toTitleMenu():
+  global currMenu, playersCanJoin
+  currMenu = TITLE_MENU
+  playersCanJoin = False
+  pygame.mixer.music.load(melee_opening)
+  pygame.mixer.music.play(1000)
+
+
+toTitleMenu()
 
 def toFightMenu():
   global currMenu
@@ -63,6 +79,10 @@ def toFightMenu():
 def toWinMenu():
   global currMenu
   menus[WIN_MENU].setWinner(menus[FIGHT_MENU].winner)
+  pygame.mixer.music.stop()
+  #pygame.mixer.music.load(win_music)
+  #pygame.mixer.music.play(1000)
+  win_cheer.play()
   currMenu = WIN_MENU
 
 currTime = time.time()
@@ -71,10 +91,11 @@ playersCanJoin = True
 
 # When a key is pressed
 def onKeyPress(key):
-  global currMenu, menus
+  global currMenu, menus, gameRunning
   menus[currMenu].keyDown(key)
   if currMenu == LOBBY_MENU:
     if key == pygame.K_SPACE and len(players) > 0:
+      pygame.mixer.music.stop()
       toMapMenu()
     if key == pygame.K_z:
       keys = players.keys()
@@ -85,20 +106,35 @@ def onKeyPress(key):
           menus[LOBBY_MENU].queueRemove(lobbyPlayer.body)
           menus[LOBBY_MENU].queueRemove(lobbyPlayer.poly)
           del players[id]
+    if key == pygame.K_ESCAPE:
+      pygame.mixer.music.stop()
+      toTitleMenu()
 
   elif currMenu == MAP_MENU:
     if key == pygame.K_ESCAPE:
+      pygame.mixer.music.stop()
       toLobbyMenu()
     if key == pygame.K_SPACE:
+      pygame.mixer.music.stop()
       toFightMenu()
 
   elif currMenu == FIGHT_MENU:
     if key == pygame.K_ESCAPE:
-      toLobbyMenu()
+      pygame.mixer.music.stop()
+      toMapMenu()
 
   elif currMenu == WIN_MENU:
     if key == pygame.K_SPACE:
+      pygame.mixer.music.stop()
       toMapMenu()
+
+  elif currMenu == TITLE_MENU:
+    if key == pygame.K_SPACE:
+      pygame.mixer.music.stop()
+      toLobbyMenu()
+    if key == pygame.K_ESCAPE:
+      gameRunning = False
+
 
 # When a key is released
 def onKeyRelease(key):
@@ -122,7 +158,7 @@ def render():
 
 
 def gameLoop():
-  global currTime, deltaTime, gameRunning, screen, WIDTH, HEIGHT, currMenu, END_MUSIC_EVENT
+  global currTime, deltaTime, gameRunning, screen, WIDTH, HEIGHT, currMenu, musicState
 
   # Get current unix time
   lastTime, currTime = currTime, time.time()
@@ -149,11 +185,11 @@ def gameLoop():
       onKeyRelease(event.dict['key'])
 
     if event.type == END_MUSIC_EVENT:
-      print("Music Over")
       if currMenu == LOBBY_MENU:
-        print("Playing Loop")
+        if musicState != 1:
+          pygame.mixer.music.load(lobby_loop)
+          pygame.mixer.music.play(1000)
         musicState = 1
-        lobby_loop.play()
 
 
 

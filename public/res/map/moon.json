@@ -106,7 +106,7 @@
   "background": "moon_bg.png",
   "name": "Moon",
   "icon": "moon_icon.png",
-  "foreground": "",
+  "foreground": "moon_fg.png",
   "segments_platform": [
     [
       [

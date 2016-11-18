@@ -1,4 +1,4 @@
-import pygame, math, pymunk
+import pygame, math, pymunk, os
 from pymunk.vec2d import Vec2d
 from gamemenu import *
 from constants import *
@@ -87,6 +87,10 @@ class FightMenu(GameMenu):
     self.platformLines = self.platforms = blob["segments_platform"]
     self.spawnpoints = blob["spawnpoints"]
     self.hasInit = False
+    path = "public/res/audio/map/" + blob['filename'] + ".mp3"
+    if os.path.exists(path):
+      pygame.mixer.music.load(path)
+      pygame.mixer.music.play(1000)
 
   def createSegment(self, seg, isPlatform):
     seg = [(seg[0][0], HEIGHT - seg[0][1]),
