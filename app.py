@@ -1,4 +1,4 @@
-import pygame, thread, time, sys, math, copy, socket, json, redis
+import pygame, thread, time, sys, math, copy, socket, json, redis, random
 sys.path.append('code')
 from constants import *
 
@@ -142,7 +142,7 @@ def onKeyRelease(key):
   menus[currMenu].keyUp(key)
 
 def render():
-  global screen, currMenu, menus, deltaTime
+  global screen, currMenu, menus, deltaTime, screenShake
 
   pygame.draw.rect(screen, (0, 0, 0), (0, 0, WIDTH, HEIGHT))
 
@@ -151,10 +151,24 @@ def render():
     toWinMenu()
 
   menus[currMenu].render(screen)
-  pygame.transform.scale(screen, 
-    (REAL_WIDTH, REAL_HEIGHT),
-    real_screen
+  nScreen = pygame.transform.scale(screen, 
+    (REAL_WIDTH, REAL_HEIGHT)
   )
+
+  mostRecent = 0
+  keys = players.keys()
+  for id in keys:
+    mostRecent = max(players[id].died, mostRecent)
+
+  if time.time() - mostRecent < 0.2:
+    real_screen.blit(screen, (
+      int(random.random() * 50 - 25),
+      int(random.random() * 50 - 25),
+      REAL_WIDTH,
+      REAL_HEIGHT
+    ))
+  else:
+    real_screen.blit(screen, (0, 0, REAL_WIDTH, REAL_HEIGHT))
 
 
 def gameLoop():

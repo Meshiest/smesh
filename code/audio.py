@@ -13,3 +13,4 @@ brawl_opening = 'public/res/audio/smash_opening.mp3'
 
 menu_select = pygame.mixer.Sound('public/res/audio/menu_select.wav')
 win_cheer = pygame.mixer.Sound('public/res/audio/win_cheer.wav')
+explosion = pygame.mixer.Sound('public/res/audio/explosion.wav')

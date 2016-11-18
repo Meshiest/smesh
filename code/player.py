@@ -2,6 +2,7 @@ import time, pygame, random, math, pymunk, json
 from pymunk.vec2d import Vec2d
 from constants import *
 from imagestore import *
+from audio import *
 from utils import *
 
 class Player():
@@ -19,6 +20,7 @@ class Player():
   radius = 30
   footTheta = 0
   dead = False
+  died = 0
   lastMove = 0
 
   def __init__(self, id, conn):
@@ -30,6 +32,7 @@ class Player():
     self.foot = generateFoot()
     self.weapon = generateWeapon()
     self.lastMove = 0
+    self.died = 0
 
   def setLocation(self, theta, dist):
     if theta != None:
@@ -77,6 +80,8 @@ class Player():
   def tick(self, deltaTime):
     if self.body.position.y < -200:
       self.dead = True
+      self.died = time.time()
+      explosion.play()
       self.space.remove(self.body)
       self.space.remove(self.poly)
       return
