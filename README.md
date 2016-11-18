@@ -21,10 +21,14 @@
 
 # Connecting
 
-1. Open `[LOCALIP]:3000` on any device on the same network where `[LOCALIP]` is the ip given by `ipconfig` or `ifconfig` in a cmd/shell
+1. Open `[LOCALIP]:3000` on any **accelerometer enabled** device on the same network where `[LOCALIP]` is the ip given by `ipconfig` or `ifconfig` in a cmd/shell
 
 # More Info
 
-Checkout `MAP_README.md` for Map editor instructions
+Most menus can be navigated with SPACE/ESCAPE
+
+Should you get "ghost players" in your lobby, press Z
+
+Check out `MAP_README.md` for map editor instructions
 
 Change resolution under `WIDTH` and `HEIGHT` in `code/constants.py`, do **not** change `REAL_WIDTH` and `REAL_HEIGHT`
