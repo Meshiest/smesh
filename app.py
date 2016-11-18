@@ -92,6 +92,9 @@ playersCanJoin = True
 def onKeyPress(key):
   global currMenu, menus, gameRunning
   menus[currMenu].keyDown(key)
+  if key == pygame.K_F4:
+    pygame.display.toggle_fullscreen()
+    
   if currMenu == LOBBY_MENU:
     if key == pygame.K_SPACE and len(players) > 0:
       pygame.mixer.music.stop()
