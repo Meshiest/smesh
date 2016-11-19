@@ -143,7 +143,6 @@ weapons = [
   {'img': load('weapons/weapon_bread.png'), 'hand': (50, 180)},
   {'img': load('weapons/weapon_skullstaff.png'), 'hand': (50, 140)},
   {'img': load('weapons/weapon_horse.png'), 'hand': (50, 180)},
-  {'img': load('weapons/weapon_paddle.png'), 'hand': (45, 180)},
   {'img': load('weapons/weapon_rose.png'), 'hand': (50, 180)},
   {'img': load('weapons/weapon_snk.png'), 'hand': (25, 146)},
   {'img': load('weapons/weapon_stick.png'), 'hand': (42, 170)},
